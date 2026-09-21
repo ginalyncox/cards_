@@ -1,0 +1,366 @@
+:root {
+  --cream: #f4e7ca;
+  --ink: #241c14;
+  --night: #1d2738;
+  --panel: #27324a;
+  --gold: #e3b33b;
+  --red: #b0392c;
+  --muted: #a8b0c0;
+  --line: rgba(227, 179, 59, 0.28);
+  --radius: 12px;
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 600px at 50% -12%, #32405c 0%, transparent 60%),
+    var(--night);
+  color: var(--cream);
+  font-family: var(--sans);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 12px;
+  top: 12px;
+  z-index: 10;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+/* --- chrome --------------------------------------------------------------- */
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+}
+.brand small { color: var(--muted); }
+.mark {
+  width: 30px;
+  height: 42px;
+  border-radius: 5px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(160deg, #2f3c57, #161e2d);
+  position: relative;
+  flex: none;
+}
+.mark::after {
+  content: '★';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+.tab:hover { color: var(--cream); }
+.tab[aria-current='page'] {
+  color: var(--ink);
+  background: var(--gold);
+  font-weight: 600;
+}
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 26px 24px 60px;
+}
+
+.hidden { display: none !important; }
+
+/* --- controls ------------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  align-items: flex-end;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  flex: 1 1 200px;
+}
+.controls label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.hint { opacity: 0.7; }
+
+input, select, textarea {
+  font: inherit;
+  color: var(--cream);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--cream);
+  padding: 9px 16px;
+}
+button:hover { background: rgba(255, 255, 255, 0.12); }
+button.primary {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+button.danger { border-color: rgba(176, 57, 44, 0.6); color: #f0a79d; }
+
+.spread-blurb { color: var(--muted); margin: 14px 2px 0; }
+.count { color: var(--muted); font-size: 0.86rem; margin: 0; }
+.note { color: var(--muted); font-size: 0.86rem; }
+
+/* --- reading board -------------------------------------------------------- */
+
+.board {
+  display: grid;
+  gap: 18px;
+  justify-content: center;
+  margin-top: 22px;
+}
+.board:empty { display: none; }
+
+.slot { position: relative; }
+
+/*
+ * The Celtic Cross lays its second card across the first. Only the card itself
+ * rotates — shrunk and dropped below the midpoint — so the card underneath
+ * stays visible and clickable rather than being buried.
+ */
+/* The crossing slot's own box would otherwise swallow clicks meant for the
+   card it lies across, so only its card and caption take pointer events. */
+.slot.cross { z-index: 2; pointer-events: none; }
+.slot.cross .card-button,
+.slot.cross .caption { pointer-events: auto; }
+.slot.cross .card-button { transform: translateY(54px) rotate(90deg) scale(0.68); }
+.slot.cross .card-button:hover { transform: translateY(50px) rotate(90deg) scale(0.68); }
+.slot.cross .slot-label { visibility: hidden; }
+/* Nudged clear of the caption belonging to the card underneath. */
+.slot.cross .caption { margin-top: 24px; }
+
+.slot-label {
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.card-button {
+  padding: 0;
+  border: none;
+  background: none;
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  transition: transform 140ms ease;
+}
+.card-button:hover { transform: translateY(-4px); }
+.card-button svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.slot .caption {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 6px;
+  min-height: 1.2em;
+}
+.caption .rev { color: var(--red); font-weight: 600; }
+
+.board-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+/* --- library -------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(146px, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.grid .card-button svg { border: none; }
+.grid figcaption {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+figure { margin: 0; }
+
+/* --- dialog & detail ------------------------------------------------------ */
+
+dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #202b3f;
+  color: var(--cream);
+  max-width: 760px;
+  width: calc(100% - 32px);
+  padding: 24px;
+}
+dialog::backdrop { background: rgba(6, 9, 15, 0.72); }
+dialog .close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--muted);
+  padding: 4px 8px;
+}
+
+.detail { display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+.detail h2 { font-family: var(--serif); margin: 0 0 2px; font-size: 1.5rem; }
+.detail .sub { color: var(--muted); margin: 0 0 16px; font-size: 0.88rem; }
+.detail h3 {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 18px 0 4px;
+}
+.detail p { margin: 0 0 8px; }
+.detail .art svg { width: 100%; height: auto; border-radius: 10px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 4px 0 0; list-style: none; }
+.chips li {
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--cream);
+}
+
+/* --- journal -------------------------------------------------------------- */
+
+.entry {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.entry header { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.entry h3 { font-family: var(--serif); margin: 0; font-size: 1.1rem; }
+.entry time { color: var(--muted); font-size: 0.82rem; }
+.entry ol { margin: 10px 0 0; padding-left: 20px; }
+.entry li { margin-bottom: 3px; }
+.entry textarea { width: 100%; margin-top: 12px; min-height: 76px; resize: vertical; }
+.entry .row { display: flex; gap: 8px; margin-top: 10px; }
+
+/* --- learn ---------------------------------------------------------------- */
+
+.prose { max-width: 66ch; }
+.prose h2 { font-family: var(--serif); color: var(--gold); margin-top: 32px; }
+.prose h3 { margin-bottom: 4px; }
+.prose li { margin-bottom: 6px; }
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 22px 24px 40px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+footer a { color: var(--gold); }
+.disclaim { font-style: italic; }
+
+@media (max-width: 640px) {
+  .detail { grid-template-columns: 1fr; }
+  /*
+   * Narrow screens drop the spread geometry entirely and read the cards in
+   * order — overlapping slots in one grid cell are unusable on a phone.
+   */
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+  }
+  .slot { width: min(42vw, 170px); }
+  .slot.cross .card-button,
+  .slot.cross .card-button:hover { transform: none; }
+  .slot.cross .slot-label { visibility: visible; }
+  .slot.cross .caption { margin-top: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-button { transition: none; }
+  .card-button:hover { transform: none; }
+}

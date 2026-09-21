@@ -1,0 +1,14 @@
+{
+  "name": "cards",
+  "version": "1.0.0",
+  "description": "A Rider-Waite-Smith tarot deck and companion app — 78 cards, vector art, spreads and a private journal.",
+  "type": "module",
+  "private": true,
+  "author": "Gina Lyn Cox",
+  "license": "MIT",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test test/*.test.js",
+    "build:cards": "node scripts/export-cards.js"
+  }
+}

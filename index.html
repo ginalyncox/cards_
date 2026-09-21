@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cards — a Rider-Waite-Smith tarot deck and companion</title>
+<meta name="description" content="A full 78-card Rider-Waite-Smith style tarot deck with spreads, card meanings and a private reading journal.">
+<link rel="stylesheet" href="src/css/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='%2325324a'/><path d='M16 6l2.6 6.2 6.4.5-4.9 4.2 1.5 6.3L16 19.8 10.4 23l1.5-6.3L7 12.7l6.4-.5z' fill='%23e3b33b'/></svg>">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span>
+      <strong>Cards</strong>
+      <small>a Rider-Waite-Smith deck &amp; companion</small>
+    </span>
+  </div>
+  <nav class="tabs" aria-label="Sections">
+    <button class="tab" data-view="read" aria-current="page">Reading</button>
+    <button class="tab" data-view="library">Library</button>
+    <button class="tab" data-view="journal">Journal</button>
+    <button class="tab" data-view="learn">Learn</button>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="view" data-view="read">
+    <form class="controls" id="draw-form">
+      <label>Spread
+        <select id="spread"></select>
+      </label>
+      <label>Question <span class="hint">(optional)</span>
+        <input id="question" type="text" maxlength="160" placeholder="What should I know about&hellip;" autocomplete="off">
+      </label>
+      <label class="check">
+        <input id="reversals" type="checkbox" checked>
+        Include reversals
+      </label>
+      <button class="primary" type="submit">Shuffle &amp; draw</button>
+    </form>
+    <p class="spread-blurb" id="spread-blurb"></p>
+    <div class="board" id="board" aria-live="polite"></div>
+    <div class="board-actions hidden" id="board-actions">
+      <button id="reveal-all" type="button">Reveal all</button>
+      <button id="save-reading" type="button">Save to journal</button>
+    </div>
+  </section>
+
+  <section class="view hidden" data-view="library">
+    <form class="controls" id="library-form">
+      <label>Search
+        <input id="search" type="search" placeholder="Name, keyword or meaning" autocomplete="off">
+      </label>
+      <label>Arcana
+        <select id="filter-arcana">
+          <option value="">All 78</option>
+          <option value="major">Major Arcana</option>
+          <option value="wands">Wands</option>
+          <option value="cups">Cups</option>
+          <option value="swords">Swords</option>
+          <option value="pentacles">Pentacles</option>
+        </select>
+      </label>
+      <p class="count" id="library-count"></p>
+    </form>
+    <div class="grid" id="library"></div>
+  </section>
+
+  <section class="view hidden" data-view="journal">
+    <div class="controls">
+      <p class="count" id="journal-count"></p>
+      <button id="export-journal" type="button">Export as JSON</button>
+      <button id="clear-journal" class="danger" type="button">Clear journal</button>
+    </div>
+    <p class="note">Entries are stored in this browser only. Nothing is uploaded anywhere.</p>
+    <div id="journal"></div>
+  </section>
+
+  <section class="view hidden" data-view="learn">
+    <div class="prose" id="learn"></div>
+  </section>
+
+</main>
+
+<dialog id="card-dialog">
+  <button class="close" type="button" aria-label="Close">&times;</button>
+  <div id="dialog-body"></div>
+</dialog>
+
+<footer>
+  <p>
+    Card meanings and vector art in this app are original work by Gina Lyn Cox,
+    written in the Rider-Waite-Smith tradition. The 1909 Pamela Colman Smith
+    plates are in the public domain in the United States; no scans of them ship here.
+    See <a href="LICENSE">LICENSE</a> for terms of use.
+  </p>
+  <p class="disclaim">For reflection and entertainment. Not medical, legal, financial or mental-health advice — for those, please talk to a qualified professional.</p>
+</footer>
+
+<script type="module" src="src/js/app.js"></script>
+</body>
+</html>
