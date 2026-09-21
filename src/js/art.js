@@ -138,50 +138,74 @@ const hero = (gx, gy, { facing = 'front', hat = true, arm = 'down' } = {}) => {
     G: C.greenDark,
     h: C.hair,
     c: C.greenHero,
+    C: C.leaf,
     w: C.white,
     b: C.blueDark,
+    B: C.blue,
+    o: C.gold,
   };
+  // Pointed cap + rounded face reads as cartoony adventure hero at card size.
   const rows = hat
     ? [
-        '..kkk..',
-        '.kccck.',
-        'kkcccck',
-        '.ksssk.',
-        '..sss..',
-        '.kgggk.',
-        'kgggggk',
-        'kg.g.gk',
-        '.kgggk.',
-        '.G...G.',
-        '.b...b.',
-        '.b...b.',
+        '....k....',
+        '...kCk...',
+        '..kCCCk..',
+        '.kCCCCCk.',
+        'kkCsssCkk',
+        '.ksssssk.',
+        '..s.s.s..',
+        '..kgggk..',
+        '.kgggggk.',
+        'kggwggggk',
+        '.kgggggk.',
+        '..G...G..',
+        '..b...b..',
+        '..B...B..',
       ]
     : [
-        '..hhh..',
-        '.hsssh.',
-        '.hsssh.',
-        '..sss..',
-        '.kgggk.',
-        'kgggggk',
-        'kg.g.gk',
-        '.kgggk.',
-        '.G...G.',
-        '.b...b.',
-        '.b...b.',
+        '...hhh...',
+        '..hsssh..',
+        '.hsssssh.',
+        '..s.s.s..',
+        '..kgggk..',
+        '.kgggggk.',
+        'kggwggggk',
+        '.kgggggk.',
+        '..G...G..',
+        '..b...b..',
+        '..B...B..',
       ];
   let out = sprite(gx, gy, rows, P);
-  if (arm === 'up') out += px(gx - 1, gy + 5, 1, 3, C.flesh) + px(gx + 7, gy + 5, 1, 3, C.flesh);
-  if (arm === 'out') out += px(gx - 2, gy + 6, 2, 1, C.flesh) + px(gx + 7, gy + 6, 2, 1, C.flesh);
-  if (facing === 'side') out += px(gx + 5, gy + 3, 1, 1, C.ink);
+  if (arm === 'up') {
+    out += px(gx, gy + 7, 1, 4, C.flesh) + px(gx + 8, gy + 7, 1, 4, C.flesh);
+    out += px(gx - 1, gy + 6, 1, 1, C.flesh) + px(gx + 9, gy + 6, 1, 1, C.flesh);
+  }
+  if (arm === 'out') {
+    out += px(gx - 2, gy + 8, 3, 1, C.flesh) + px(gx + 8, gy + 8, 3, 1, C.flesh);
+  }
+  if (facing === 'side') out += px(gx + 6, gy + 5, 1, 1, C.ink);
   return out;
 };
 
-const figureRobed = (gx, gy, robe, { crown = false, tall = 14 } = {}) => {
-  let out = px(gx + 2, gy, 4, 3, C.flesh) + px(gx + 3, gy + 1, 1, 1, C.ink);
-  if (crown) out += px(gx + 1, gy - 2, 6, 2, C.gold) + px(gx + 2, gy - 3, 1, 1, C.goldBright) + px(gx + 5, gy - 3, 1, 1, C.goldBright);
-  out += px(gx, gy + 3, 8, tall - 5, robe) + px(gx + 1, gy + tall - 2, 2, 2, C.ink) + px(gx + 5, gy + tall - 2, 2, 2, C.ink);
+const figureRobed = (gx, gy, robe, { crown = false, tall = 16 } = {}) => {
+  let out = '';
+  if (crown) {
+    out += px(gx + 1, gy - 3, 7, 2, C.gold) + px(gx + 2, gy - 4, 1, 1, C.goldBright) +
+      px(gx + 4, gy - 5, 1, 2, C.goldBright) + px(gx + 6, gy - 4, 1, 1, C.goldBright);
+  }
+  out += px(gx + 2, gy, 5, 4, C.flesh) + px(gx + 3, gy + 1, 1, 1, C.ink) + px(gx + 5, gy + 1, 1, 1, C.ink);
+  out += px(gx + 3, gy + 3, 2, 1, C.fleshDark);
+  out += px(gx, gy + 4, 9, tall - 6, robe);
+  out += px(gx + 1, gy + 5, 7, 2, robe === C.white ? C.cream : C.ink);
+  out += px(gx + 1, gy + tall - 2, 2, 2, C.ink) + px(gx + 6, gy + tall - 2, 2, 2, C.ink);
   return out;
 };
+
+const cloud = (gx, gy) =>
+  px(gx + 2, gy, 4, 1, C.white) + px(gx, gy + 1, 8, 2, C.white) + px(gx + 1, gy + 3, 6, 1, C.white);
+
+const bush = (gx, gy) =>
+  px(gx + 1, gy, 4, 1, C.leaf) + px(gx, gy + 1, 6, 3, C.grass) + px(gx + 1, gy + 2, 4, 1, C.grassDark);
 
 // --- suit emblems -----------------------------------------------------------
 
@@ -233,91 +257,99 @@ const PIP_LAYOUT = {
 };
 
 const COURT_SEAT = {
-  11: (suit) => hero(14, 42, { hat: false }) + EMBLEM[suit](34, 36),
-  12: (suit) => px(10, 50, 14, 4, C.dirt) + hero(12, 36) + EMBLEM[suit](34, 32),
+  11: (suit) => hero(12, 38, { hat: false }) + EMBLEM[suit](34, 34),
+  12: (suit) => px(8, 52, 16, 4, C.dirt) + hero(10, 32) + EMBLEM[suit](34, 30),
   13: (suit) =>
-    px(12, 36, 12, 18, C.stone) + px(14, 40, 3, 4, C.night) + figureRobed(16, 30, C.blue, { crown: true }) + EMBLEM[suit](34, 34),
+    px(10, 34, 14, 20, C.stone) + px(12, 38, 4, 5, C.night) + figureRobed(14, 26, C.blue, { crown: true, tall: 20 }) + EMBLEM[suit](34, 32),
   14: (suit) =>
-    px(10, 34, 16, 20, C.stoneDark) + px(12, 38, 4, 5, C.night) + figureRobed(15, 28, C.red, { crown: true }) + EMBLEM[suit](34, 32),
+    px(8, 32, 18, 22, C.stoneDark) + px(10, 36, 5, 6, C.night) + figureRobed(13, 24, C.red, { crown: true, tall: 22 }) + EMBLEM[suit](34, 30),
 };
 
 // --- Major Arcana scenes ----------------------------------------------------
 
 const MAJOR_SCENE = {
-  0: () => skyBand() + groundBand(56, C.sand, C.dirt) + mountain(28, 28, 14, 12, C.violet) +
-    sun(8, 10) + hero(16, 40, { arm: 'out' }) + px(28, 58, 3, 2, C.white) + gem(36, 48, C.rupee),
-  1: () => skyBand(C.gold) + groundBand(54, C.grassDark, C.greenDark) +
-    px(12, 48, 26, 4, C.dirtDark) + hero(18, 34, { hat: false, arm: 'up' }) +
-    cup(10, 42) + wand(36, 38) + sword(8, 50) + pentacle(34, 50) +
-    px(22, 12, 6, 2, C.goldBright) + px(20, 14, 2, 2, C.goldBright) + px(28, 14, 2, 2, C.goldBright),
-  2: () => sceneBox(C.night) + px(8, 20, 4, 40, C.ink) + px(38, 20, 4, 40, C.white) +
-    figureRobed(18, 28, C.blue, { tall: 22 }) + moon(22, 12) + starPx(10, 14) + starPx(34, 16, C.white),
-  3: () => skyBand() + groundBand(50, C.sand, C.dirt) + tree(6, 40) + tree(38, 42) +
-    figureRobed(18, 30, C.white, { crown: true, tall: 20 }) + heart(8, 28) + heart(36, 28) + sun(34, 10),
-  4: () => skyBand(C.redDark) + groundBand(54, C.dirt, C.dirtDark) + mountain(4, 24, 16, 14, C.stoneDark) +
-    mountain(30, 22, 14, 16, C.stone) + px(14, 34, 18, 20, C.stone) + figureRobed(18, 28, C.red, { crown: true }),
-  5: () => skyBand(C.stone) + groundBand(54, C.dirt, C.dirtDark) +
-    px(8, 18, 5, 36, C.stoneDark) + px(37, 18, 5, 36, C.stoneDark) +
-    figureRobed(18, 26, C.violet, { crown: true, tall: 22 }) +
-    px(20, 56, 8, 2, C.gold) + hero(8, 52, { hat: false }) + hero(34, 52, { hat: false }),
-  6: () => skyBand() + groundBand(56) + sun(20, 8) +
-    hero(10, 42, { hat: false }) + hero(28, 42, { hat: false }) +
-    heart(20, 30) + tree(4, 44) + tree(40, 44),
-  7: () => skyBand() + groundBand(56, C.dirt, C.dirtDark) +
-    px(14, 38, 20, 14, C.stone) + px(16, 42, 4, 4, C.night) + px(28, 42, 4, 4, C.night) +
-    figureRobed(18, 24, C.blue, { crown: true }) +
-    px(10, 52, 6, 4, C.white) + px(32, 52, 6, 4, C.ink) + gem(22, 34, C.gold),
-  8: () => skyBand(C.gold) + groundBand(54) + hero(12, 38, { arm: 'out' }) +
-    px(28, 46, 10, 8, C.dirt) + px(30, 42, 6, 4, C.dirtDark) + px(32, 40, 2, 2, C.ink) +
-    px(20, 12, 8, 2, C.goldBright) + heart(8, 24),
+  0: () => skyBand() + cloud(6, 10) + cloud(30, 14) + groundBand(56, C.sand, C.dirt) +
+    mountain(28, 28, 14, 12, C.violet) + sun(8, 10) + bush(36, 52) +
+    hero(16, 38, { arm: 'out' }) + px(30, 58, 3, 2, C.white) + gem(38, 46, C.rupee),
+  1: () => skyBand() + sun(34, 10) + cloud(6, 12) + groundBand(54, C.grassDark, C.greenDark) +
+    px(10, 48, 30, 4, C.dirtDark) + px(12, 46, 26, 2, C.dirt) +
+    hero(17, 30, { hat: false, arm: 'up' }) +
+    cup(8, 40) + wand(36, 36) + sword(6, 48) + pentacle(34, 48) +
+    px(20, 10, 8, 2, C.goldBright) + px(18, 12, 2, 2, C.gold) + px(28, 12, 2, 2, C.gold),
+  2: () => sceneBox(C.night) + px(8, 18, 5, 42, C.ink) + px(37, 18, 5, 42, C.white) +
+    figureRobed(17, 26, C.blue, { tall: 24 }) + moon(20, 10) + starPx(10, 14) + starPx(34, 16, C.white) +
+    px(18, 48, 12, 2, C.violet),
+  3: () => skyBand() + sun(34, 10) + cloud(8, 12) + groundBand(50, C.sand, C.dirt) +
+    tree(4, 36) + tree(38, 38) + bush(14, 48) + bush(28, 48) +
+    figureRobed(17, 26, C.white, { crown: true, tall: 22 }) + heart(8, 26) + heart(36, 26),
+  4: () => skyBand(C.redDark) + groundBand(54, C.dirt, C.dirtDark) + mountain(4, 22, 16, 14, C.stoneDark) +
+    mountain(30, 20, 14, 16, C.stone) + px(13, 32, 20, 22, C.stone) + px(15, 36, 4, 5, C.night) +
+    figureRobed(17, 24, C.red, { crown: true, tall: 22 }),
+  5: () => skyBand(C.stone) + cloud(20, 10) + groundBand(54, C.dirt, C.dirtDark) +
+    px(7, 16, 6, 38, C.stoneDark) + px(37, 16, 6, 38, C.stoneDark) +
+    figureRobed(17, 22, C.violet, { crown: true, tall: 24 }) +
+    px(18, 56, 12, 2, C.gold) + hero(6, 48, { hat: false }) + hero(32, 48, { hat: false }),
+  6: () => skyBand() + sun(20, 8) + cloud(4, 14) + groundBand(56) +
+    tree(2, 40) + tree(40, 40) + bush(20, 54) +
+    hero(8, 40, { hat: false }) + hero(28, 40, { hat: false }) + heart(20, 28),
+  7: () => skyBand() + cloud(30, 10) + groundBand(56, C.dirt, C.dirtDark) +
+    px(13, 36, 22, 16, C.stone) + px(15, 40, 5, 5, C.night) + px(28, 40, 5, 5, C.night) +
+    figureRobed(17, 20, C.blue, { crown: true, tall: 18 }) +
+    px(8, 52, 7, 4, C.white) + px(33, 52, 7, 4, C.ink) + gem(21, 32, C.gold),
+  8: () => skyBand(C.gold) + groundBand(54) + bush(4, 50) +
+    hero(10, 36, { arm: 'out' }) +
+    px(28, 46, 12, 8, C.dirt) + px(30, 42, 8, 4, C.dirtDark) + px(32, 40, 3, 2, C.ink) +
+    px(18, 12, 10, 2, C.goldBright) + heart(6, 24),
   9: () => sceneBox(C.nightDeep) + groundBand(54, C.stone, C.stoneDark) +
-    figureRobed(18, 28, C.grey, { tall: 20 }) + starPx(34, 18) + starPx(10, 22, C.white) +
-    lantern(22, 40),
+    figureRobed(17, 24, C.grey, { tall: 22 }) + starPx(34, 16) + starPx(10, 20, C.white) +
+    lantern(22, 38) + mountain(32, 40, 10, 8, C.stoneDark),
   10: () => sceneBox(C.night) +
-    px(16, 24, 18, 18, C.gold) + px(19, 27, 12, 12, C.parchment) + px(23, 31, 4, 4, C.ink) +
+    px(15, 22, 20, 20, C.gold) + px(18, 25, 14, 14, C.parchment) + px(22, 29, 6, 6, C.ink) +
     starPx(8, 12, C.white) + starPx(38, 12, C.white) + starPx(8, 56, C.white) + starPx(38, 56, C.white) +
-    gem(10, 34) + gem(36, 34, C.gold),
+    gem(8, 34) + gem(36, 34, C.gold) + gem(22, 14, C.heart),
   11: () => skyBand(C.violet) + groundBand(54, C.stone, C.stoneDark) +
-    px(8, 18, 4, 36, C.stoneDark) + px(38, 18, 4, 36, C.stoneDark) +
-    figureRobed(18, 28, C.red, { crown: true }) + sword(12, 30) +
-    px(28, 36, 6, 2, C.gold) + px(28, 40, 2, 2, C.gold) + px(32, 40, 2, 2, C.gold),
-  12: () => skyBand() + groundBand(58) +
-    px(12, 16, 26, 2, C.dirtDark) + px(24, 18, 2, 8, C.dirtDark) +
-    el('g', { transform: `rotate(180 ${25 * S} ${40 * S})` }, hero(18, 28, { hat: false })) +
-    gem(22, 18, C.goldBright),
+    px(7, 16, 5, 38, C.stoneDark) + px(38, 16, 5, 38, C.stoneDark) +
+    figureRobed(17, 24, C.red, { crown: true, tall: 22 }) + sword(10, 28) +
+    px(28, 34, 8, 2, C.gold) + px(28, 38, 2, 2, C.gold) + px(34, 38, 2, 2, C.gold),
+  12: () => skyBand() + cloud(8, 10) + groundBand(58) + bush(34, 54) +
+    px(10, 14, 30, 3, C.dirtDark) + px(23, 17, 3, 8, C.dirtDark) +
+    el('g', { transform: `rotate(180 ${25 * S} ${40 * S})` }, hero(17, 26, { hat: false })) +
+    gem(22, 16, C.goldBright),
   13: () => skyBand(C.stoneDark) + groundBand(54, C.dirtDark, C.ink) +
-    sun(20, 48) + px(14, 40, 20, 10, C.white) + figureRobed(18, 22, C.ink, { tall: 18 }) +
-    px(34, 24, 2, 16, C.ink) + px(36, 24, 8, 5, C.white) + flag(36, 24),
-  14: () => skyBand() + groundBand(54) + figureRobed(18, 28, C.white, { tall: 20 }) +
-    cup(10, 36) + cup(34, 38) + px(15, 40, 18, 1, C.water) + sun(34, 10) + gem(22, 18, C.gold),
-  15: () => sceneBox(C.ink) + figureRobed(18, 22, C.violetDark, { tall: 18 }) +
-    px(16, 18, 3, 3, C.grey) + px(29, 18, 3, 3, C.grey) +
-    hero(8, 48, { hat: false }) + hero(32, 48, { hat: false }) +
-    px(20, 42, 8, 2, C.red) + starPx(10, 12, C.red) + starPx(36, 12, C.red),
+    sun(20, 48) + px(12, 40, 24, 10, C.white) + figureRobed(16, 18, C.ink, { tall: 20 }) +
+    px(34, 20, 2, 18, C.ink) + flag(36, 20),
+  14: () => skyBand() + sun(34, 10) + cloud(6, 12) + groundBand(54) + bush(4, 50) +
+    figureRobed(17, 24, C.white, { tall: 22 }) +
+    cup(8, 34) + cup(34, 36) + px(13, 38, 22, 2, C.water) + gem(22, 16, C.gold),
+  15: () => sceneBox(C.ink) + figureRobed(17, 18, C.violetDark, { tall: 20 }) +
+    px(15, 14, 4, 4, C.grey) + px(29, 14, 4, 4, C.grey) +
+    hero(6, 46, { hat: false }) + hero(32, 46, { hat: false }) +
+    px(18, 40, 12, 2, C.red) + starPx(10, 10, C.red) + starPx(36, 10, C.red),
   16: () => sceneBox(C.nightDeep) +
-    px(18, 22, 12, 32, C.stone) + px(16, 20, 16, 3, C.dirtDark) + px(20, 28, 3, 4, C.night) +
-    bolt(28, 8) + bolt(10, 14) +
-    px(10, 44, 4, 4, C.flesh) + px(36, 48, 4, 4, C.flesh),
+    px(17, 20, 14, 34, C.stone) + px(15, 18, 18, 3, C.dirtDark) + px(20, 28, 4, 5, C.night) +
+    px(22, 18, 4, 2, C.gold) + bolt(28, 6) + bolt(8, 12) +
+    px(8, 44, 5, 5, C.flesh) + px(36, 48, 5, 5, C.flesh),
   17: () => sceneBox(C.night) +
-    starPx(22, 12, C.goldBright) + starPx(10, 16, C.white) + starPx(36, 14, C.white) +
-    starPx(14, 26, C.white) + starPx(34, 26, C.gold) +
+    starPx(22, 10, C.goldBright) + starPx(10, 14, C.white) + starPx(36, 12, C.white) +
+    starPx(14, 24, C.white) + starPx(34, 24, C.gold) +
     px(4, 52, 42, 12, C.water) + px(4, 52, 42, 1, C.waterDeep) +
-    hero(18, 40, { hat: false, arm: 'out' }) + gem(8, 56, C.rupee),
-  18: () => sceneBox(C.nightDeep) + moon(20, 10) +
-    px(8, 30, 8, 24, C.stoneDark) + px(34, 30, 8, 24, C.stoneDark) +
-    px(22, 40, 6, 20, C.dirt) + px(20, 58, 10, 4, C.water) +
-    px(22, 56, 3, 2, C.blue) + howl(14, 48) + howl(32, 50),
-  19: () => skyBand(C.gold) + groundBand(54) + sun(18, 10) +
-    px(4, 48, 42, 2, C.leaf) + hero(18, 40, { arm: 'out' }) +
-    flower(8, 50) + flower(36, 52),
-  20: () => skyBand(C.stone) + px(4, 50, 42, 14, C.water) +
-    figureRobed(18, 18, C.white, { tall: 16 }) +
-    px(14, 52, 20, 10, C.dirtDark) + hero(18, 48, { hat: false, arm: 'up' }) +
-    starPx(10, 12, C.gold) + starPx(36, 12, C.gold),
-  21: () => skyBand() + groundBand(58, C.leaf, C.grassDark) +
-    px(10, 16, 30, 2, C.greenHero) + px(10, 16, 2, 40, C.greenHero) + px(38, 16, 2, 40, C.greenHero) + px(10, 54, 30, 2, C.greenHero) +
-    hero(18, 34, { arm: 'up' }) +
-    starPx(8, 10, C.gold) + starPx(38, 10, C.gold) + starPx(8, 60, C.gold) + starPx(38, 60, C.gold),
+    hero(17, 36, { hat: false, arm: 'out' }) + gem(8, 56, C.rupee),
+  18: () => sceneBox(C.nightDeep) + moon(20, 8) +
+    px(7, 28, 10, 26, C.stoneDark) + px(33, 28, 10, 26, C.stoneDark) +
+    px(21, 38, 8, 22, C.dirt) + px(18, 58, 14, 4, C.water) +
+    px(22, 56, 4, 2, C.blue) + howl(12, 48) + howl(32, 50),
+  19: () => skyBand(C.gold) + groundBand(54) + sun(17, 8) +
+    px(4, 48, 42, 2, C.leaf) + flower(8, 50) + flower(36, 52) + bush(24, 52) +
+    hero(17, 36, { arm: 'out' }),
+  20: () => skyBand(C.stone) + cloud(8, 10) + px(4, 50, 42, 14, C.water) +
+    figureRobed(17, 14, C.white, { tall: 18 }) +
+    px(12, 50, 24, 12, C.dirtDark) + hero(17, 44, { hat: false, arm: 'up' }) +
+    starPx(8, 12, C.gold) + starPx(38, 12, C.gold),
+  21: () => skyBand() + cloud(16, 10) + groundBand(58, C.leaf, C.grassDark) +
+    px(9, 14, 32, 2, C.greenHero) + px(9, 14, 2, 42, C.greenHero) + px(39, 14, 2, 42, C.greenHero) +
+    px(9, 54, 32, 2, C.greenHero) +
+    hero(17, 32, { arm: 'up' }) +
+    starPx(6, 10, C.gold) + starPx(40, 10, C.gold) + starPx(6, 60, C.gold) + starPx(40, 60, C.gold),
 };
 
 function lantern(gx, gy) {
