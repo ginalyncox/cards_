@@ -14,7 +14,7 @@ present.</p>
   <li><strong>Pick a spread that fits.</strong> One card for a day. Three for a
       decision. Ten when you genuinely have an hour.</li>
   <li><strong>Read the picture first.</strong> Before the keywords, say out loud
-      what you see. Your reaction is data.</li>
+      what you see. Your reaction is data — even when the art is chunky pixels.</li>
   <li><strong>Then read the position.</strong> The same card means different
       things in "Advice" and in "Hopes and Fears."</li>
   <li><strong>Write one sentence down.</strong> The journal tab exists for this.
@@ -22,7 +22,8 @@ present.</p>
 </ol>
 
 <h2>The structure of the deck</h2>
-<p>Seventy-eight cards in two groups.</p>
+<p>Seventy-eight cards in two groups — the classic Rider-Waite-Smith map,
+redrawn as an overworld you can read at a glance.</p>
 
 <h3>Major Arcana — 22 cards</h3>
 <p>The Fool's journey from 0 to XXI. These are the big, slow, structural themes:
@@ -51,11 +52,12 @@ readers never use them.</p>
 <p>The 1909 Rider-Waite-Smith deck was the first widely published deck to
 illustrate every card, including the pips, with a full scene. That is why the
 Three of Swords is a pierced heart rather than three abstract blades.</p>
-<p>The faces in this app are original vector drawings, built from the same
-emblems and the same flat, heavily outlined colour language, so the cards read
-at a glance without reproducing Pamela Colman Smith's plates. The Major Arcana,
-the court cards and the best-known pips are drawn as scenes; the remaining pips
-show their suit emblem in the traditional counting arrangement.</p>
+<p><strong>Wilds</strong> keeps those emblems and renames the paint job: every face
+is original pixel art in a cartoony 16-bit adventure palette — grass, temple
+stone, night caves, gold gems — so the cards read like a pocket overworld.
+No third-party game sprites are used. The Major Arcana, the court cards and the
+best-known pips are drawn as scenes; the remaining pips show their suit emblem
+in the traditional counting arrangement.</p>
 
 <h2>A note on what tarot is not</h2>
 <p>These readings are for reflection. They are not medical, legal, financial or

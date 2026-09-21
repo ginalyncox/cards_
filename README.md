@@ -1,7 +1,8 @@
-# Cards
+# Wilds
 
-A complete Rider-Waite-Smith tarot deck and companion app. Seventy-eight cards,
-drawn as vector art, with meanings, spreads and a private reading journal.
+A complete Rider-Waite-Smith tarot deck and companion app, redrawn as cartoony
+16-bit adventure pixel art. Seventy-eight cards, meanings, spreads and a private
+reading journal.
 
 No build step, no dependencies, no server, no network calls. Open it and read.
 
@@ -21,12 +22,12 @@ carries keywords, an upright reading, a reversed reading, its element, and a
 description of what is in the picture. Majors also carry their astrological and
 Hebrew-letter attributions.
 
-**The art.** Every card face is generated as SVG from shape primitives in the
-RWS colour language — flat fills, heavy outlines, cream border, title banner.
-The Major Arcana, the sixteen court cards and the best-known pips are drawn as
-scenes; the remaining pips show their suit emblem in the traditional counting
-arrangement. Export the whole deck to files with `npm run build:cards`, which
-writes `dist/cards/*.svg` at print resolution.
+**The art.** Every card face is generated as SVG from a logical pixel grid —
+chunky heroes, temple pillars, night caves and suit emblems in a verdant
+adventure palette. Original work inspired by classic handheld / 16-bit fantasy
+looks; not affiliated with any game franchise and ships no third-party sprites.
+Export the whole deck with `npm run build:cards`, which writes
+`dist/cards/*.svg` at print resolution.
 
 **Six spreads.** Daily Card, Past/Present/Future, Situation/Action/Outcome,
 Horseshoe, Celtic Cross and Year Ahead. Cards deal face down; tap to turn each
@@ -50,11 +51,12 @@ src/data/majors.js      22 Major Arcana
 src/data/minors.js      56 Minor Arcana, by suit
 src/data/deck.js        assembles the deck; shuffle and draw
 src/data/spreads.js     spread layouts and position meanings
-src/js/art.js           SVG card faces and the card back
+src/js/art.js           pixel SVG card faces and the card back
 src/js/app.js           views, reading board, library, journal wiring
 src/js/journal.js       localStorage persistence
 src/js/learn.js         reference text for the Learn tab
-src/css/app.css         styles
+src/css/app.css         overworld companion styles
+src/fonts/              Press Start 2P (SIL OFL) for UI chrome
 scripts/serve.js        dependency-free static server
 scripts/export-cards.js writes every card to dist/cards/*.svg
 test/deck.test.js       deck integrity, draw behaviour and render checks
@@ -81,10 +83,13 @@ PRNG sequence. It falls back to `Math.random` only where crypto is unavailable.
 
 MIT — see [LICENSE](LICENSE).
 
-The card meanings and the vector art are original work by Gina Lyn Cox, written
+The card meanings and the pixel art are original work by Gina Lyn Cox, written
 and drawn in the Rider-Waite-Smith tradition. The original 1909 plates by
 Pamela Colman Smith are public domain in the United States; no scans of them
 are distributed here, and copyright status varies by country.
+
+Press Start 2P is included under the SIL Open Font Licence — see
+`src/fonts/OFL.txt`.
 
 ## A note on scope
 
