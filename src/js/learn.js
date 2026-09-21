@@ -51,11 +51,17 @@ readers never use them.</p>
 <p>The 1909 Rider-Waite-Smith deck was the first widely published deck to
 illustrate every card, including the pips, with a full scene. That is why the
 Three of Swords is a pierced heart rather than three abstract blades.</p>
-<p>The faces in this app are original vector drawings, built from the same
-emblems and the same flat, heavily outlined colour language, so the cards read
-at a glance without reproducing Pamela Colman Smith's plates. The Major Arcana,
-the court cards and the best-known pips are drawn as scenes; the remaining pips
-show their suit emblem in the traditional counting arrangement.</p>
+<p>This deck keeps those scenes and draws them as 8-bit pixel art: every card
+face is painted onto a grid of 20 by 26 chunky pixels, in the flat, hard-edged,
+limited-palette style of an NES adventure game. Solid colour skies, squat
+big-headed figures, no gradients, no soft edges. The titles are set in a
+hand-built four-by-five pixel font.</p>
+<p>It is a translation, not a reproduction. Pamela Colman Smith's plates are not
+copied here — the emblems and the compositions are, redrawn at a resolution
+where a lion is nine pixels wide and still unmistakably a lion. The Major
+Arcana, the sixteen court cards and the best-known pips are drawn as scenes;
+the remaining pips show their suit emblem in the traditional counting
+arrangement, so you can still read a card by counting it.</p>
 
 <h2>A note on what tarot is not</h2>
 <p>These readings are for reflection. They are not medical, legal, financial or

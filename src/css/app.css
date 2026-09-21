@@ -9,6 +9,9 @@
   --line: rgba(227, 179, 59, 0.28);
   --radius: 12px;
   --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  /* Chunky monospace for chrome that sits next to the 8-bit cards. Body copy
+     stays in the sans stack — legibility beats theme. */
+  --display: ui-monospace, 'Cascadia Mono', 'Courier New', monospace;
   --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -58,9 +61,11 @@ body {
 }
 .brand strong {
   display: block;
-  font-family: var(--serif);
-  font-size: 1.35rem;
-  letter-spacing: 0.06em;
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .brand small { color: var(--muted); }
 .mark {
@@ -73,13 +78,13 @@ body {
   flex: none;
 }
 .mark::after {
-  content: '★';
+  content: '';
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--gold);
-  font-size: 14px;
+  /* A four-pixel sparkle, drawn the same way the cards are. */
+  background:
+    linear-gradient(var(--gold), var(--gold)) 11px 13px / 4px 12px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 7px 17px / 12px 4px no-repeat;
 }
 
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -200,7 +205,7 @@ button.danger { border-color: rgba(176, 57, 44, 0.6); color: #f0a79d; }
 
 .slot-label {
   text-align: center;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 0.82rem;
   letter-spacing: 0.05em;
   color: var(--gold);

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DECK, SUITS, draw, shuffle, byId } from '../src/data/deck.js';
 import { SPREADS } from '../src/data/spreads.js';
-import { cardSVG, backSVG } from '../src/js/art.js';
+import { cardSVG, backSVG, CARD_SIZE, FONT } from '../src/js/art.js';
 
 test('the deck holds exactly 78 unique cards', () => {
   assert.equal(DECK.length, 78);
@@ -85,22 +85,33 @@ test('every card renders to well-formed SVG, upright and reversed', () => {
       assert.equal((svg.match(/<svg/g) || []).length, 1);
       assert.ok(svg.includes('role="img"') && svg.includes('aria-label'));
       assert.ok(svg.includes(`data-orientation="${reversed ? 'reversed' : 'upright'}"`));
-      assert.equal(svg.includes(`rotate(180 100 170)`), reversed);
+      const centre = `rotate(180 ${CARD_SIZE.width / 2} ${CARD_SIZE.height / 2})`;
+      assert.equal(svg.includes(centre), reversed);
     }
   }
 });
 
-test('card faces use unique clip path ids so inline SVGs do not collide', () => {
-  const a = cardSVG(DECK[0]);
-  const b = cardSVG(DECK[0]);
-  const idOf = (svg) => svg.match(/clipPath id="([^"]+)"/)[1];
-  assert.notEqual(idOf(a), idOf(b));
-  assert.ok(a.includes(`url(#${idOf(a)})`));
+test('card faces are self-contained, with no shared document ids', () => {
+  // Every face is inlined into one page, so an id or url() reference would
+  // collide across cards.
+  for (const card of DECK) {
+    const svg = cardSVG(card);
+    assert.ok(!svg.includes(' id="'), `${card.name} declares an id`);
+    assert.ok(!svg.includes('url(#'), `${card.name} references an id`);
+  }
+});
+
+test('faces render as hard-edged pixels', () => {
+  for (const card of DECK) {
+    const svg = cardSVG(card);
+    assert.ok(svg.includes('shape-rendering="crispEdges"'), `${card.name} is not crisp`);
+    assert.ok(!svg.includes('gradient'), `${card.name} uses a gradient`);
+  }
 });
 
 test('the card back is identical for every card', () => {
   assert.equal(backSVG(), backSVG());
-  assert.ok(!backSVG().includes('rotate(180 100 170)'));
+  assert.ok(!backSVG().includes('rotate(180'));
 });
 
 test('no card face emits invalid geometry', () => {
@@ -111,5 +122,29 @@ test('no card face emits invalid geometry', () => {
     for (const [, value] of svg.matchAll(numeric)) {
       assert.ok(Number(value) >= 0, `${card.name} has a negative length or radius: ${value}`);
     }
+  }
+});
+
+test('every card title fits inside the card', () => {
+  // The pixel font has no fallback, so an over-long line would run off the
+  // card edge rather than wrapping or shrinking.
+  for (const card of DECK) {
+    const svg = cardSVG(card);
+    for (const [, x, w] of svg.matchAll(/<rect x="(-?\d+)" y="\d+" width="(\d+)"/g)) {
+      assert.ok(Number(x) >= 0, `${card.name} paints left of the card edge`);
+      assert.ok(Number(x) + Number(w) <= CARD_SIZE.width, `${card.name} paints past the right edge`);
+    }
+  }
+});
+
+test('the pixel font covers every character used on a card', () => {
+  const used = new Set();
+  for (const card of DECK) {
+    const title = (card.arcana === 'major' ? card.name : `${card.rankLabel} of ${card.suitName}`).toUpperCase();
+    const numeral = card.arcana === 'major' ? card.roman : String(card.number);
+    [...title, ...numeral].forEach((ch) => used.add(ch));
+  }
+  for (const ch of used) {
+    assert.ok(FONT[ch], `no glyph for ${JSON.stringify(ch)}`);
   }
 });
