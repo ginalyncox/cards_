@@ -103,6 +103,18 @@ test('the card back is identical for every card', () => {
   assert.ok(!backSVG().includes('rotate(180 100 170)'));
 });
 
+test('generic pip sky and ground meet with no parchment gap', () => {
+  // skyBand defaults to row 52; groundBand must start there too or the cream
+  // frame shows through as a tan horizon strip on minor faces.
+  const svg = cardSVG(byId('wands-1'));
+  const rects = [...svg.matchAll(/<rect x="(\d+)" y="(\d+)" width="(\d+)" height="(\d+)" fill="([^"]+)"/g)]
+    .map(([, x, y, w, h, f]) => ({ x: +x, y: +y, w: +w, h: +h, f }));
+  const sky = rects.find((r) => r.x === 16 && r.y === 24 && r.w === 168 && r.f === '#6ec8f0');
+  const ground = rects.find((r) => r.x === 16 && r.w === 168 && r.f === '#48a838');
+  assert.ok(sky && ground, 'Ace of Wands should paint sky and grass bands');
+  assert.equal(sky.y + sky.h, ground.y);
+});
+
 test('no card face emits invalid geometry', () => {
   const numeric = /(?:\s(?:r|rx|ry|width|height)=")(-?[\d.]+)"/g;
   for (const card of DECK) {

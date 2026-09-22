@@ -80,7 +80,8 @@ const sceneBox = (fill) => px(4, 6, 42, 68, fill);
 const groundBand = (gy = 52, fill = C.grass, dark = C.grassDark) =>
   px(4, gy, 42, 68 - gy, fill) + px(4, gy, 42, 1, dark);
 
-const skyBand = (fill = C.sky) => px(4, 6, 42, 46, fill);
+/** Sky fills from the art top down to `toGy` so it meets `groundBand(toGy)`. */
+const skyBand = (fill = C.sky, toGy = 52) => px(4, 6, 42, toGy - 6, fill);
 
 // --- tiny props -------------------------------------------------------------
 
@@ -268,10 +269,10 @@ const COURT_SEAT = {
 // --- Major Arcana scenes ----------------------------------------------------
 
 const MAJOR_SCENE = {
-  0: () => skyBand() + cloud(6, 10) + cloud(30, 14) + groundBand(56, C.sand, C.dirt) +
+  0: () => skyBand(C.sky, 56) + cloud(6, 10) + cloud(30, 14) + groundBand(56, C.sand, C.dirt) +
     mountain(28, 28, 14, 12, C.violet) + sun(8, 10) + bush(36, 52) +
     hero(16, 38, { arm: 'out' }) + px(30, 58, 3, 2, C.white) + gem(38, 46, C.rupee),
-  1: () => skyBand() + sun(34, 10) + cloud(6, 12) + groundBand(54, C.grassDark, C.greenDark) +
+  1: () => skyBand(C.sky, 54) + sun(34, 10) + cloud(6, 12) + groundBand(54, C.grassDark, C.greenDark) +
     px(10, 48, 30, 4, C.dirtDark) + px(12, 46, 26, 2, C.dirt) +
     hero(17, 30, { hat: false, arm: 'up' }) +
     cup(8, 40) + wand(36, 36) + sword(6, 48) + pentacle(34, 48) +
@@ -279,24 +280,24 @@ const MAJOR_SCENE = {
   2: () => sceneBox(C.night) + px(8, 18, 5, 42, C.ink) + px(37, 18, 5, 42, C.white) +
     figureRobed(17, 26, C.blue, { tall: 24 }) + moon(20, 10) + starPx(10, 14) + starPx(34, 16, C.white) +
     px(18, 48, 12, 2, C.violet),
-  3: () => skyBand() + sun(34, 10) + cloud(8, 12) + groundBand(50, C.sand, C.dirt) +
+  3: () => skyBand(C.sky, 50) + sun(34, 10) + cloud(8, 12) + groundBand(50, C.sand, C.dirt) +
     tree(4, 36) + tree(38, 38) + bush(14, 48) + bush(28, 48) +
     figureRobed(17, 26, C.white, { crown: true, tall: 22 }) + heart(8, 26) + heart(36, 26),
-  4: () => skyBand(C.redDark) + groundBand(54, C.dirt, C.dirtDark) + mountain(4, 22, 16, 14, C.stoneDark) +
+  4: () => skyBand(C.redDark, 54) + groundBand(54, C.dirt, C.dirtDark) + mountain(4, 22, 16, 14, C.stoneDark) +
     mountain(30, 20, 14, 16, C.stone) + px(13, 32, 20, 22, C.stone) + px(15, 36, 4, 5, C.night) +
     figureRobed(17, 24, C.red, { crown: true, tall: 22 }),
-  5: () => skyBand(C.stone) + cloud(20, 10) + groundBand(54, C.dirt, C.dirtDark) +
+  5: () => skyBand(C.stone, 54) + cloud(20, 10) + groundBand(54, C.dirt, C.dirtDark) +
     px(7, 16, 6, 38, C.stoneDark) + px(37, 16, 6, 38, C.stoneDark) +
     figureRobed(17, 22, C.violet, { crown: true, tall: 24 }) +
     px(18, 56, 12, 2, C.gold) + hero(6, 48, { hat: false }) + hero(32, 48, { hat: false }),
-  6: () => skyBand() + sun(20, 8) + cloud(4, 14) + groundBand(56) +
+  6: () => skyBand(C.sky, 56) + sun(20, 8) + cloud(4, 14) + groundBand(56) +
     tree(2, 40) + tree(40, 40) + bush(20, 54) +
     hero(8, 40, { hat: false }) + hero(28, 40, { hat: false }) + heart(20, 28),
-  7: () => skyBand() + cloud(30, 10) + groundBand(56, C.dirt, C.dirtDark) +
+  7: () => skyBand(C.sky, 56) + cloud(30, 10) + groundBand(56, C.dirt, C.dirtDark) +
     px(13, 36, 22, 16, C.stone) + px(15, 40, 5, 5, C.night) + px(28, 40, 5, 5, C.night) +
     figureRobed(17, 20, C.blue, { crown: true, tall: 18 }) +
     px(8, 52, 7, 4, C.white) + px(33, 52, 7, 4, C.ink) + gem(21, 32, C.gold),
-  8: () => skyBand(C.gold) + groundBand(54) + bush(4, 50) +
+  8: () => skyBand(C.gold, 54) + groundBand(54) + bush(4, 50) +
     hero(10, 36, { arm: 'out' }) +
     px(28, 46, 12, 8, C.dirt) + px(30, 42, 8, 4, C.dirtDark) + px(32, 40, 3, 2, C.ink) +
     px(18, 12, 10, 2, C.goldBright) + heart(6, 24),
@@ -307,18 +308,18 @@ const MAJOR_SCENE = {
     px(15, 22, 20, 20, C.gold) + px(18, 25, 14, 14, C.parchment) + px(22, 29, 6, 6, C.ink) +
     starPx(8, 12, C.white) + starPx(38, 12, C.white) + starPx(8, 56, C.white) + starPx(38, 56, C.white) +
     gem(8, 34) + gem(36, 34, C.gold) + gem(22, 14, C.heart),
-  11: () => skyBand(C.violet) + groundBand(54, C.stone, C.stoneDark) +
+  11: () => skyBand(C.violet, 54) + groundBand(54, C.stone, C.stoneDark) +
     px(7, 16, 5, 38, C.stoneDark) + px(38, 16, 5, 38, C.stoneDark) +
     figureRobed(17, 24, C.red, { crown: true, tall: 22 }) + sword(10, 28) +
     px(28, 34, 8, 2, C.gold) + px(28, 38, 2, 2, C.gold) + px(34, 38, 2, 2, C.gold),
-  12: () => skyBand() + cloud(8, 10) + groundBand(58) + bush(34, 54) +
+  12: () => skyBand(C.sky, 58) + cloud(8, 10) + groundBand(58) + bush(34, 54) +
     px(10, 14, 30, 3, C.dirtDark) + px(23, 17, 3, 8, C.dirtDark) +
     el('g', { transform: `rotate(180 ${25 * S} ${40 * S})` }, hero(17, 26, { hat: false })) +
     gem(22, 16, C.goldBright),
-  13: () => skyBand(C.stoneDark) + groundBand(54, C.dirtDark, C.ink) +
+  13: () => skyBand(C.stoneDark, 54) + groundBand(54, C.dirtDark, C.ink) +
     sun(20, 48) + px(12, 40, 24, 10, C.white) + figureRobed(16, 18, C.ink, { tall: 20 }) +
     px(34, 20, 2, 18, C.ink) + flag(36, 20),
-  14: () => skyBand() + sun(34, 10) + cloud(6, 12) + groundBand(54) + bush(4, 50) +
+  14: () => skyBand(C.sky, 54) + sun(34, 10) + cloud(6, 12) + groundBand(54) + bush(4, 50) +
     figureRobed(17, 24, C.white, { tall: 22 }) +
     cup(8, 34) + cup(34, 36) + px(13, 38, 22, 2, C.water) + gem(22, 16, C.gold),
   15: () => sceneBox(C.ink) + figureRobed(17, 18, C.violetDark, { tall: 20 }) +
@@ -338,14 +339,14 @@ const MAJOR_SCENE = {
     px(7, 28, 10, 26, C.stoneDark) + px(33, 28, 10, 26, C.stoneDark) +
     px(21, 38, 8, 22, C.dirt) + px(18, 58, 14, 4, C.water) +
     px(22, 56, 4, 2, C.blue) + howl(12, 48) + howl(32, 50),
-  19: () => skyBand(C.gold) + groundBand(54) + sun(17, 8) +
+  19: () => skyBand(C.gold, 54) + groundBand(54) + sun(17, 8) +
     px(4, 48, 42, 2, C.leaf) + flower(8, 50) + flower(36, 52) + bush(24, 52) +
     hero(17, 36, { arm: 'out' }),
-  20: () => skyBand(C.stone) + cloud(8, 10) + px(4, 50, 42, 14, C.water) +
+  20: () => skyBand(C.stone, 50) + cloud(8, 10) + px(4, 50, 42, 14, C.water) +
     figureRobed(17, 14, C.white, { tall: 18 }) +
     px(12, 50, 24, 12, C.dirtDark) + hero(17, 44, { hat: false, arm: 'up' }) +
     starPx(8, 12, C.gold) + starPx(38, 12, C.gold),
-  21: () => skyBand() + cloud(16, 10) + groundBand(58, C.leaf, C.grassDark) +
+  21: () => skyBand(C.sky, 58) + cloud(16, 10) + groundBand(58, C.leaf, C.grassDark) +
     px(9, 14, 32, 2, C.greenHero) + px(9, 14, 2, 42, C.greenHero) + px(39, 14, 2, 42, C.greenHero) +
     px(9, 54, 32, 2, C.greenHero) +
     hero(17, 32, { arm: 'up' }) +
@@ -376,18 +377,18 @@ function flower(gx, gy) {
 // --- special pip scenes -----------------------------------------------------
 
 const PIP_SCENE = {
-  'swords-3': () => skyBand(C.stone) + groundBand(58, C.stoneDark, C.ink) +
+  'swords-3': () => skyBand(C.stone, 58) + groundBand(58, C.stoneDark, C.ink) +
     heart(20, 28) + sword(18, 18) + sword(24, 22) + sword(21, 36),
   'swords-9': () => sceneBox(C.nightDeep) +
     [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => sword(8 + (i % 3) * 12, 12 + Math.floor(i / 3) * 14)).join('') +
     px(12, 52, 24, 10, C.parchment) + px(14, 54, 6, 4, C.flesh) + heart(28, 56),
-  'wands-10': () => skyBand() + groundBand(56) +
+  'wands-10': () => skyBand(C.sky, 56) + groundBand(56) +
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => wand(8 + (i % 5) * 7, 16 + Math.floor(i / 5) * 12)).join('') +
     hero(18, 42),
   'pentacles-5': () => sceneBox(C.night) + groundBand(54, C.stone, C.stoneDark) +
     px(28, 14, 14, 28, C.gold) + [0, 1, 2, 3, 4].map((i) => pentacle(30, 16 + i * 5)).join('') +
     hero(8, 42, { hat: false }) + hero(16, 46, { hat: false }),
-  'cups-3': () => skyBand() + groundBand(56) +
+  'cups-3': () => skyBand(C.sky, 56) + groundBand(56) +
     hero(8, 42, { hat: false }) + hero(18, 40) + hero(30, 42, { hat: false }) +
     cup(10, 28) + cup(20, 24) + cup(32, 28),
 };
@@ -398,7 +399,8 @@ function scene(card) {
   const skyFill = card.suit === 'swords' ? C.stone : card.suit === 'cups' ? C.skyDeep : C.sky;
   const gFill = card.suit === 'pentacles' ? C.dirt : C.grass;
   const gDark = card.suit === 'pentacles' ? C.dirtDark : C.grassDark;
-  const base = skyBand(skyFill) + groundBand(54, gFill, gDark);
+  // Default sky/ground meet at row 52 — no parchment strip in between.
+  const base = skyBand(skyFill) + groundBand(52, gFill, gDark);
   if (card.number > 10) return base + COURT_SEAT[card.number](card.suit);
   return base + PIP_LAYOUT[card.number].map(([x, y]) => EMBLEM[card.suit](x, y)).join('');
 }
