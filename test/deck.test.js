@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DECK, SUITS, draw, shuffle, byId } from '../src/data/deck.js';
 import { SPREADS } from '../src/data/spreads.js';
-import { cardSVG, backSVG } from '../src/js/art.js';
+import { cardSVG, backSVG, CARD_SIZE } from '../src/js/art.js';
 
 test('the deck holds exactly 78 unique cards', () => {
   assert.equal(DECK.length, 78);
@@ -85,7 +85,8 @@ test('every card renders to well-formed SVG, upright and reversed', () => {
       assert.equal((svg.match(/<svg/g) || []).length, 1);
       assert.ok(svg.includes('role="img"') && svg.includes('aria-label'));
       assert.ok(svg.includes(`data-orientation="${reversed ? 'reversed' : 'upright'}"`));
-      assert.equal(svg.includes(`rotate(180 100 170)`), reversed);
+      const centre = `rotate(180 ${CARD_SIZE.width / 2} ${CARD_SIZE.height / 2})`;
+      assert.equal(svg.includes(centre), reversed);
     }
   }
 });
@@ -98,9 +99,17 @@ test('card faces use unique clip path ids so inline SVGs do not collide', () => 
   assert.ok(a.includes(`url(#${idOf(a)})`));
 });
 
+test('faces render as hard-edged pixels', () => {
+  for (const card of DECK) {
+    const svg = cardSVG(card);
+    assert.ok(svg.includes('shape-rendering="crispEdges"'), `${card.name} is not crisp`);
+    assert.ok(!svg.includes('gradient'), `${card.name} uses a gradient`);
+  }
+});
+
 test('the card back is identical for every card', () => {
   assert.equal(backSVG(), backSVG());
-  assert.ok(!backSVG().includes('rotate(180 100 170)'));
+  assert.ok(!backSVG().includes('rotate(180'));
 });
 
 test('generic pip sky and ground meet with no parchment gap', () => {
@@ -113,6 +122,13 @@ test('generic pip sky and ground meet with no parchment gap', () => {
   const ground = rects.find((r) => r.x === 16 && r.w === 168 && r.f === '#48a838');
   assert.ok(sky && ground, 'Ace of Wands should paint sky and grass bands');
   assert.equal(sky.y + sky.h, ground.y);
+  assert.equal(ground.y + ground.h, 296, 'ground reaches the art-window bottom');
+});
+
+test('standalone exports can load the bundled pixel font', () => {
+  const svg = cardSVG(byId('major-16'), { fontHref: 'PressStart2P-Regular.ttf' });
+  assert.match(svg, /@font-face/);
+  assert.match(svg, /url\('PressStart2P-Regular\.ttf'\)/);
 });
 
 test('no card face emits invalid geometry', () => {
@@ -122,6 +138,18 @@ test('no card face emits invalid geometry', () => {
     assert.ok(!svg.includes('NaN') && !svg.includes('undefined'), `${card.name} has an unresolved value`);
     for (const [, value] of svg.matchAll(numeric)) {
       assert.ok(Number(value) >= 0, `${card.name} has a negative length or radius: ${value}`);
+    }
+  }
+});
+
+test('every card title fits inside the card', () => {
+  // The pixel font has no fallback, so an over-long line would run off the
+  // card edge rather than wrapping or shrinking.
+  for (const card of DECK) {
+    const svg = cardSVG(card);
+    for (const [, x, w] of svg.matchAll(/<rect x="(-?\d+)" y="\d+" width="(\d+)"/g)) {
+      assert.ok(Number(x) >= 0, `${card.name} paints left of the card edge`);
+      assert.ok(Number(x) + Number(w) <= CARD_SIZE.width, `${card.name} paints past the right edge`);
     }
   }
 });

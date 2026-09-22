@@ -70,8 +70,10 @@ npm test
 
 Covers deck completeness (78 unique cards, correct suit and rank structure),
 that every card has full interpretive text, that draws never repeat a card,
-that reversals can be switched off, that spread positions fit their grids, and
-that every card renders to valid SVG in both orientations.
+that reversals can be switched off, that spread positions fit their grids, that
+every card renders to valid, hard-edged SVG in both orientations, that no title
+paints past the card edge, and that the pixel font has a glyph for every
+character a card uses.
 
 ## Shuffling
 

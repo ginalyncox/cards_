@@ -47,7 +47,7 @@ const C = {
 
 const el = (tag, attrs = {}, kids = '') => {
   const a = Object.entries(attrs)
-    .map(([k, v]) => `${k}="${v}"`)
+    .map(([key, value]) => `${key}="${value}"`)
     .join(' ');
   return `<${tag} ${a}>${kids}</${tag}>`;
 };
@@ -78,7 +78,9 @@ const frame = () =>
 const sceneBox = (fill) => px(4, 6, 42, 68, fill);
 
 const groundBand = (gy = 52, fill = C.grass, dark = C.grassDark) =>
-  px(4, gy, 42, 68 - gy, fill) + px(4, gy, 42, 1, dark);
+  // The art window starts at row 6 and is 68 rows tall, ending at row 74.
+  // Measure from that actual edge so no parchment shows above the title plate.
+  px(4, gy, 42, 74 - gy, fill) + px(4, gy, 42, 1, dark);
 
 /** Sky fills from the art top down to `toGy` so it meets `groundBand(toGy)`. */
 const skyBand = (fill = C.sky, toGy = 52) => px(4, 6, 42, toGy - 6, fill);
@@ -405,15 +407,11 @@ function scene(card) {
   return base + PIP_LAYOUT[card.number].map(([x, y]) => EMBLEM[card.suit](x, y)).join('');
 }
 
-function titleFor(card) {
-  if (card.arcana === 'major') return card.name.toUpperCase();
-  return `${card.rankLabel} of ${card.suitName}`.toUpperCase();
-}
-
-function numeralFor(card) {
+const titleFor = (card) => (card.arcana === 'major' ? card.name : `${card.rankLabel} of ${card.suitName}`).toUpperCase();
+const numeralFor = (card) => {
   if (card.arcana === 'major') return card.roman;
   return card.isCourt ? '' : String(card.number);
-}
+};
 
 /** Pixel banner title — short names fit; longer ones shrink via letter-spacing. */
 function titleText(label, y) {
@@ -432,7 +430,7 @@ function titleText(label, y) {
 let faceSeq = 0;
 
 /** Render one card face as a standalone SVG string. */
-export function cardSVG(card, { reversed = false, width = 200 } = {}) {
+export function cardSVG(card, { reversed = false, width = 200, fontHref = null } = {}) {
   const clipId = `face-${card.id}-${(faceSeq += 1)}`;
   const body = scene(card);
   const numeral = numeralFor(card);
@@ -456,9 +454,12 @@ export function cardSVG(card, { reversed = false, width = 200 } = {}) {
     titleText(titleFor(card), H - 14),
   ].join('');
 
-  const defs = el('defs', {}, el('clipPath', { id: clipId }, rect(4 * S, 6 * S, 42 * S, 68 * S, '#fff')));
+  const fontFace = fontHref
+    ? el('style', {}, `@font-face{font-family:'Press Start 2P';src:url('${fontHref}') format('truetype');}`)
+    : '';
+  const defs = el('defs', {}, fontFace + el('clipPath', { id: clipId }, rect(4 * S, 6 * S, 42 * S, 68 * S, '#fff')));
   const spin = reversed ? ` transform="rotate(180 ${W / 2} ${H / 2})"` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${width}" height="${(width * H) / W}" role="img" data-card="${card.id}" data-orientation="${reversed ? 'reversed' : 'upright'}" aria-label="${titleFor(card)}${reversed ? ', reversed' : ''}" style="image-rendering:pixelated">${defs}<g${spin}>${inner}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${width}" height="${(width * H) / W}" role="img" data-card="${card.id}" data-orientation="${reversed ? 'reversed' : 'upright'}" aria-label="${titleFor(card)}${reversed ? ', reversed' : ''}" shape-rendering="crispEdges" style="image-rendering:pixelated">${defs}<g${spin}>${inner}</g></svg>`;
 }
 
 /** The card back — overworld night with a glowing gem lattice. */
@@ -475,3 +476,4 @@ export function backSVG({ width = 200 } = {}) {
 }
 
 export const PALETTE = C;
+export const CARD_SIZE = { width: W, height: H };
