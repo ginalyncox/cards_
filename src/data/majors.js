@@ -1,5 +1,5 @@
 // Major Arcana — 22 trumps of the Rider-Waite-Smith tradition (1909).
-// Imagery notes describe the Pamela Colman Smith plates, which are public domain.
+// Imagery notes describe the Wilds pixel scenes (original art).
 
 export const MAJORS = [
   {
@@ -8,7 +8,7 @@ export const MAJORS = [
     keywordsRev: ['recklessness', 'hesitation', 'bad timing', 'naivety'],
     upright: 'A beginning taken on trust. You have less information than you would like and enough courage to move anyway. The Fool is not stupid — he is unweighted. Travel light, say yes, and let the road teach you.',
     reversed: 'Either the leap is being avoided or it is being taken blindly. Ask which. Reversed, this card points to a risk that has not been thought through, a commitment dodged, or a fear dressed up as prudence.',
-    imagery: 'A youth in a patterned tunic steps toward a cliff edge, face turned to the sun. A white rose in one hand, a knapsack on a staff over the shoulder, a small white dog leaping at the heels.',
+    imagery: 'A green-capped traveler steps toward a sandy ledge under a bright pixel sun. Mountains rise ahead; a small white companion and a glowing gem mark the start of the road.',
     yesno: 'yes',
   },
   {
@@ -17,7 +17,7 @@ export const MAJORS = [
     keywordsRev: ['manipulation', 'scattered energy', 'untapped talent', 'trickery'],
     upright: 'Everything you need is already on the table. The Magician is the moment when intention meets skill and something real gets made. Name what you want plainly, then use what is in front of you.',
     reversed: 'Power used crookedly, or not used at all. Watch for persuasion that shades into manipulation — your own or someone else\'s — and for talent left idle because the goal was never stated.',
-    imagery: 'A figure stands at an altar bearing a cup, a pentacle, a sword and a wand. One arm lifts a wand to the sky, the other points to the earth. A lemniscate floats overhead; roses and lilies crowd the foreground.',
+    imagery: 'An adventurer stands at a wooden workbench under a gold sky, arms raised. A cup, wand, sword and pentacle lie ready — tools of every suit — with a bright infinity mark overhead.',
     yesno: 'yes',
   },
   {
@@ -26,7 +26,7 @@ export const MAJORS = [
     keywordsRev: ['secrets withheld', 'disconnection', 'ignored instinct', 'surface only'],
     upright: 'Do not act yet. Something is developing below the waterline and it needs quiet to finish. The High Priestess trusts what she knows before she can prove it. Listen inward; the answer is not in the discourse.',
     reversed: 'The inner voice has been overruled, or information is being kept from you. Reversed, she can also mean you are keeping a secret that costs more to hold than to tell.',
-    imagery: 'A veiled woman sits between a black pillar marked B and a white pillar marked J, a crescent moon at her feet, a scroll marked TORA half hidden in her robe. Pomegranates pattern the curtain behind her.',
+    imagery: 'Between a black pillar and a white pillar, a blue-robed seer sits in a night cave. A crescent moon and twin stars watch; silence fills the temple stone.',
     yesno: 'maybe',
   },
   {
@@ -35,7 +35,7 @@ export const MAJORS = [
     keywordsRev: ['smothering', 'creative block', 'depletion', 'neglected self-care'],
     upright: 'Growth you can touch. The Empress governs the fertile, sensory, unhurried part of life — gardens, bread, bodies, projects that need feeding rather than forcing. Tend the thing; do not rush it.',
     reversed: 'Care has gone lopsided: too much poured outward and nothing left for you, or a creative life that has gone dry. Reversed, she asks who is nourishing the nourisher.',
-    imagery: 'A crowned woman reclines on cushions in a field of ripe wheat, a shield bearing the sign of Venus at her side, a forest and waterfall behind, her gown scattered with pomegranates.',
+    imagery: 'A crowned figure in white rests in a wheat-gold field between two trees. Heart icons bloom at either side under a cheerful overworld sun.',
     yesno: 'yes',
   },
   {
@@ -44,7 +44,7 @@ export const MAJORS = [
     keywordsRev: ['rigidity', 'domination', 'absent father', 'rules without reason'],
     upright: 'Order makes freedom possible. The Emperor is the scaffolding — the schedule, the contract, the boundary held without apology. If things feel chaotic, build the frame before you build the content.',
     reversed: 'Structure turned into control, or authority that has failed you. Reversed, this card can mean rules defended long after they stopped serving anyone, including you.',
-    imagery: 'A bearded ruler sits on a stone throne carved with four ram heads, an ankh sceptre in one hand, an orb in the other, barren red mountains behind him.',
+    imagery: 'A red-robed ruler sits on a stone throne before barren pixel mountains under a crimson sky. Order carved from rock.',
     yesno: 'yes',
   },
   {
@@ -53,7 +53,7 @@ export const MAJORS = [
     keywordsRev: ['dogma', 'rebellion', 'personal path', 'hollow ritual'],
     upright: 'The well-worn path, and the people who keep it. Study with someone who knows more than you. Conventional answers are conventional because they usually work — this is the season to use one.',
     reversed: 'The tradition no longer fits. Reversed, the Hierophant is the moment you stop asking permission from an institution and start building your own practice — or the warning that you are performing a ritual you no longer believe.',
-    imagery: 'A robed pontiff raises two fingers in blessing between two grey pillars, crossed keys at his feet, two tonsured acolytes kneeling before him.',
+    imagery: 'A violet-robed teacher blesses from temple steps between grey pillars. Two kneeling students wait; crossed gold keys rest at the feet.',
     yesno: 'maybe',
   },
   {
@@ -62,7 +62,7 @@ export const MAJORS = [
     keywordsRev: ['misalignment', 'avoidance', 'imbalance', 'second-guessing'],
     upright: 'A real choice between two goods, decided by what you actually value. The Lovers is about union — with a person, a calling, a version of yourself — that only holds if you choose it out loud.',
     reversed: 'Values and behaviour have come apart. Reversed, this points to a decision dodged, a relationship carrying uneven weight, or an agreement made to keep the peace rather than to be true.',
-    imagery: 'A naked man and woman stand beneath a winged figure in cloud. Behind her, a serpent in a fruiting tree; behind him, a tree of flames. A mountain rises between them.',
+    imagery: 'Two bare-headed figures stand in a green field beneath a sun disc. A heart floats between them; trees frame the choice.',
     yesno: 'yes',
   },
   {
@@ -71,7 +71,7 @@ export const MAJORS = [
     keywordsRev: ['scattered force', 'stalling', 'aggression', 'no destination'],
     upright: 'Opposing forces harnessed and driven in one direction. You win this by holding the reins, not by being gentle with yourself about focus. Pick the destination and refuse the detours.',
     reversed: 'Motion without a heading, or a standstill. Reversed, the two sphinxes pull against each other — competing priorities, or force applied where steering was needed.',
-    imagery: 'An armoured figure rides a stone chariot under a starred canopy, drawn by one black and one white sphinx. A winged sun disc marks the chariot front; a walled city recedes behind.',
+    imagery: 'An armoured driver rides a stone chariot drawn by one white and one black beast. A city wall fades behind; a gold gem marks the brow.',
     yesno: 'yes',
   },
   {
@@ -80,7 +80,7 @@ export const MAJORS = [
     keywordsRev: ['self-doubt', 'force', 'burnout', 'unmanaged impulse'],
     upright: 'The lion is not killed, it is calmed. Strength is the slow, unglamorous kind: staying kind while frightened, staying steady while provoked. Soft hands, firm intention.',
     reversed: 'Either you are white-knuckling something that needs tenderness, or you have run out of reserves. Reversed, this card often means the courage is there and the self-belief is not.',
-    imagery: 'A woman in white, a lemniscate above her head and a chain of roses at her waist, gently closes the jaws of a tawny lion that leans into her.',
+    imagery: 'A gentle hero closes a hand on a sandy-maned beast without force. A golden lemniscate shines above; a heart rests in the grass.',
     yesno: 'yes',
   },
   {
@@ -89,7 +89,7 @@ export const MAJORS = [
     keywordsRev: ['isolation', 'avoidance', 'refusing help', 'lost thread'],
     upright: 'Withdraw on purpose. The Hermit carries his own small light and walks slowly by it. Answers arrive when the noise stops. If someone offers to mentor you, say yes; if someone asks you to mentor them, also say yes.',
     reversed: 'Solitude that has curdled into hiding, or a refusal of help you need. Reversed can also mean it is time to come back down the mountain and rejoin people.',
-    imagery: 'A grey-robed elder stands on a snowy peak, a six-pointed star burning inside his raised lantern, a long staff in his other hand.',
+    imagery: 'A grey-robed hermit holds a lantern on a stone ridge under a deep night sky. One star answers the lamp.',
     yesno: 'maybe',
   },
   {
@@ -98,7 +98,7 @@ export const MAJORS = [
     keywordsRev: ['resistance', 'downturn', 'bad timing', 'clinging'],
     upright: 'The situation is about to move on its own. Some of what happens now is not yours to cause or prevent — it is the turn of the wheel. Ride it; note where you sit on the rim.',
     reversed: 'A cycle repeating because it has not been learned, or a downswing you are fighting. Reversed, the card asks what you keep gripping as the wheel goes round.',
-    imagery: 'A great wheel lettered TARO and marked with alchemical signs turns in the sky. A sphinx sits above with a sword, Anubis rises at the right, a serpent descends at the left, and four winged figures read books in the corners.',
+    imagery: 'A great gold wheel turns against the night, rimmed with gems. Four corner stars keep the compass of change.',
     yesno: 'yes',
   },
   {
@@ -107,7 +107,7 @@ export const MAJORS = [
     keywordsRev: ['bias', 'evasion', 'imbalance', 'unresolved consequence'],
     upright: 'The accounting comes due, and it is accurate. Tell the truth, honour the agreement, weigh both sides without flinching. Legal and contractual matters tend to resolve on their actual merits here.',
     reversed: 'Something is being weighed unfairly — by you, by someone else, or by a system. Reversed, Justice points to consequences dodged or a verdict you have already passed without hearing the evidence.',
-    imagery: 'A crowned figure sits between two pillars, an upright sword in the right hand and level scales in the left, one foot emerging from beneath a violet veil.',
+    imagery: 'Between temple pillars, a crowned figure holds a sword and balanced gold pans. Violet sky, stone floor — justice as a clear blade.',
     yesno: 'maybe',
   },
   {
@@ -116,7 +116,7 @@ export const MAJORS = [
     keywordsRev: ['stalling', 'martyrdom', 'resistance', 'pointless delay'],
     upright: 'Nothing moves, and that is the lesson. The Hanged Man gives up the struggle on purpose and sees the whole thing differently from upside down. Stop pushing. Let the view change you.',
     reversed: 'A pause that has stopped being useful, or suffering worn as identity. Reversed, ask whether you are waiting for insight or just waiting.',
-    imagery: 'A man hangs serenely by one ankle from a living T-shaped tree, his free leg crossed behind, hands behind his back, a halo of light around his head.',
+    imagery: 'A hero hangs upside-down from a wooden frame, calm as a held breath. A bright gem marks the tether; the field waits below.',
     yesno: 'no',
   },
   {
@@ -125,7 +125,7 @@ export const MAJORS = [
     keywordsRev: ['clinging', 'stalled change', 'fear of ending', 'slow decay'],
     upright: 'Something is over. Not tragic — finished. Death clears the ground so the next thing can exist, and it does not negotiate. Name what has ended and stop resuscitating it.',
     reversed: 'The ending is being refused. Reversed, this is the long drawn-out version: a job, a relationship, or a self-image kept on life support past its time.',
-    imagery: 'An armoured skeleton rides a white horse carrying a black banner with a white rose. A bishop, a woman and a child meet it on the road; two towers and a rising sun stand at the horizon.',
+    imagery: 'A dark rider on a pale mount carries a white banner across grey earth. A low sun rises behind — ending as clearance, not ruin.',
     yesno: 'no',
   },
   {
@@ -134,7 +134,7 @@ export const MAJORS = [
     keywordsRev: ['excess', 'impatience', 'clashing parts', 'overcorrection'],
     upright: 'The right proportion, found slowly. Temperance mixes opposites until they make something drinkable — work and rest, boldness and care. Nothing here is fixed by extremes.',
     reversed: 'Too much of one thing. Reversed, this card shows a life tilted out of proportion, or a correction swung so hard it created the opposite problem.',
-    imagery: 'A winged angel, one foot on land and one in a pool, pours liquid between two cups. Irises bloom at the water\'s edge; a crown of light sits over a distant path between mountains.',
+    imagery: 'An angelic figure pours water from cup to cup on a green bank. Temperance as a careful mix under a warm sun.',
     yesno: 'yes',
   },
   {
@@ -143,7 +143,7 @@ export const MAJORS = [
     keywordsRev: ['release', 'seeing the trap', 'reclaiming power', 'detachment'],
     upright: 'A bind you are participating in. Addiction, a contract, a dynamic that feels inevitable — the chains in this image are loose enough to lift off. The Devil is not evil; he is the part of you that prefers the familiar cage.',
     reversed: 'The grip is loosening. Reversed, this is the moment of seeing the arrangement clearly and beginning to step out of it — often awkward, always freeing.',
-    imagery: 'A horned figure with bat wings crouches on a black pedestal. A naked man and woman, small horns and tails grown, stand chained to the block by collars that hang slack.',
+    imagery: 'A horned violet figure looms in a black cave above two bound adventurers. Red star-sparks warn of the chain you choose.',
     yesno: 'no',
   },
   {
@@ -152,7 +152,7 @@ export const MAJORS = [
     keywordsRev: ['delayed disaster', 'fear of change', 'near miss', 'slow unravelling'],
     upright: 'The false structure comes down, fast. It is a shock and it is a correction — what falls could not have held. Get to safety, then look at what was actually load-bearing.',
     reversed: 'Collapse deferred or partially survived. Reversed, you may be bracing for an upheaval that keeps not arriving, or dismantling something yourself before it falls on you.',
-    imagery: 'Lightning strikes the crown off a tall tower on a crag. Flames burst from three windows; two figures fall headlong through a dark sky scattered with yods.',
+    imagery: 'Lightning splits a stone tower; two figures tumble into night. The crown of certainty is struck off.',
     yesno: 'no',
   },
   {
@@ -161,7 +161,7 @@ export const MAJORS = [
     keywordsRev: ['discouragement', 'disconnection', 'lost faith', 'self-doubt'],
     upright: 'After the Tower, the quiet. The Star is healing that happens without effort — hope returning, a sense of being on the right road again. Keep pouring; keep going.',
     reversed: 'Faith has thinned. Reversed, the Star points to burnout, a dimmed sense of purpose, or a gift you have stopped believing is worth offering.',
-    imagery: 'A naked woman kneels at a pool, one foot on water and one on land, pouring from two vessels. One great eight-pointed star and seven smaller ones fill the sky; an ibis rests in a tree.',
+    imagery: 'A kneeling figure pours starlight into a night pool. One great star and lesser ones crown the sky; a green gem rests in the water.',
     yesno: 'yes',
   },
   {
@@ -170,7 +170,7 @@ export const MAJORS = [
     keywordsRev: ['clarity returning', 'truth revealed', 'released fear', 'confusion lifting'],
     upright: 'Not everything you are seeing is there. The Moon is the country of dreams, projection and half-light — fears that feel like facts. Move slowly, do not sign anything, and pay close attention to dreams.',
     reversed: 'The fog is clearing, or the deception is surfacing. Reversed, this often marks the end of a confusing stretch and the return of your own judgement.',
-    imagery: 'A moon with a face in profile drips yods over a path running between two towers. A dog and a wolf howl; a crayfish climbs from the pool in the foreground.',
+    imagery: 'A crescent moon lights twin towers and a winding path. A crayfish climbs from a pool; two howling beasts flank the road.',
     yesno: 'no',
   },
   {
@@ -179,7 +179,7 @@ export const MAJORS = [
     keywordsRev: ['dimmed joy', 'delay', 'overexposure', 'forced positivity'],
     upright: 'Plainly good. Things are visible, warm and going well, and you are allowed to enjoy it without bracing. The Sun favours health, children, creative work and anything that wants daylight.',
     reversed: 'The good thing is real but muted — a delay, a shadow cast by something else, or cheerfulness being performed over something unaddressed.',
-    imagery: 'A naked child with a red banner rides a white horse before a high wall of sunflowers, under a broad-rayed sun with a human face.',
+    imagery: 'A huge sun disc fills a gold sky above a child-like hero in a flowered field. Joy without armour.',
     yesno: 'yes',
   },
   {
@@ -188,7 +188,7 @@ export const MAJORS = [
     keywordsRev: ['self-doubt', 'ignored call', 'harsh self-judgement', 'unfinished business'],
     upright: 'A summons you recognise. Old material comes up to be looked at honestly, and then you are free of it. This is the card of the second chance taken and the calling answered.',
     reversed: 'The call is being ignored, or the verdict you keep passing on yourself is crueller than the facts. Reversed, something unresolved is still asking for an honest look.',
-    imagery: 'An angel blows a banner-hung trumpet from the clouds. Grey figures — man, woman and child — rise with open arms from their coffins on a wide sea.',
+    imagery: 'A pale angel sounds a call above a stone chest rising from water. An answering figure lifts arms from the box — wake-up call.',
     yesno: 'yes',
   },
   {
@@ -197,7 +197,7 @@ export const MAJORS = [
     keywordsRev: ['near-complete', 'loose ends', 'delayed closure', 'stuck cycle'],
     upright: 'The circuit closes. A long chapter finishes properly, with the lesson actually learned — and the next one is already implied. Celebrate it before you start again.',
     reversed: 'So close. Reversed, the World marks the last ten per cent that never got finished, or a completion you have not let yourself feel.',
-    imagery: 'A dancing figure wrapped in a violet scarf holds two wands inside a great laurel wreath bound at top and bottom. A man, an eagle, a bull and a lion fill the four corners.',
+    imagery: 'A dancing hero at the centre of a green victory wreath. Four corner stars seal the map; the overworld is whole.',
     yesno: 'yes',
   },
 ];

@@ -1,333 +1,410 @@
-// Card faces drawn as 8-bit pixel art.
-//
-// Everything on a card is painted onto a 20x26 grid of chunky pixels, in the
-// flat, hard-edged, limited-palette style of an NES adventure game: solid
-// colour backgrounds, squat big-headed figures, no gradients and no
-// anti-aliasing. Pixels are emitted as SVG rectangles (runs of the same colour
-// merged into one rect) so the cards stay crisp at any size.
+// Pixel card faces for the Wilds deck — original RWS scenes redrawn in a
+// cartoony 16-bit adventure palette (verdant fields, temple stone, night caves).
+// Not affiliated with any game franchise; no third-party sprites are used.
 
-const COLS = 20;
-const ROWS = 26;
-const PX = 8; // units per pixel
+const W = 200;
+const H = 340;
+const S = 4; // logical pixel size in SVG units
 
-const CARD_W = 24 * PX; // 192
-const CARD_H = 40 * PX; // 320
-const ART_X = 2 * PX;
-const ART_Y = 4 * PX;
-
-const PAL = {
-  0: '#101018', // outline
-  w: '#fcfcfc',
-  k: '#bcbcbc',
-  K: '#6c6c74',
-  f: '#fcd8a8', // skin
-  r: '#f83800',
-  R: '#a81000',
-  o: '#fc9838',
-  y: '#f8c838', // gold
-  Y: '#fcfc98', // pale yellow
-  g: '#20a820',
-  G: '#106810',
-  b: '#5cbcfc', // day sky
-  B: '#0058f8',
-  N: '#182058', // night
-  t: '#e4a05c', // sand
-  T: '#883000', // wood
-  p: '#c840c8',
-  P: '#6844fc',
-  c: '#f8e0b0', // card stock
+const C = {
+  cream: '#f0e6c8',
+  parchment: '#e8d4a8',
+  ink: '#1a1420',
+  outline: '#0c0810',
+  sky: '#6ec8f0',
+  skyDeep: '#3a90c8',
+  night: '#1a2850',
+  nightDeep: '#0c1838',
+  grass: '#48a838',
+  grassDark: '#287820',
+  leaf: '#70d040',
+  dirt: '#c88040',
+  dirtDark: '#905028',
+  stone: '#8898a8',
+  stoneDark: '#506070',
+  sand: '#e8c878',
+  gold: '#f0c030',
+  goldBright: '#fff060',
+  red: '#e03830',
+  redDark: '#a01818',
+  blue: '#3080e0',
+  blueDark: '#1848a0',
+  water: '#2890d0',
+  waterDeep: '#186090',
+  greenHero: '#28a828',
+  greenDark: '#187018',
+  tunic: '#38c838',
+  flesh: '#f0c890',
+  fleshDark: '#d09860',
+  hair: '#c86820',
+  white: '#f8f8f0',
+  grey: '#a0a8b0',
+  violet: '#7858b0',
+  violetDark: '#483078',
+  heart: '#e84868',
+  rupee: '#40e880',
 };
 
-const TRANSPARENT = '_';
+const el = (tag, attrs = {}, kids = '') => {
+  const a = Object.entries(attrs)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+  return `<${tag} ${a}>${kids}</${tag}>`;
+};
 
-// --- pixel canvas -----------------------------------------------------------
+const rect = (x, y, w, h, fill, extra = {}) => el('rect', { x, y, width: w, height: h, fill, ...extra });
 
-const canvas = (bg = TRANSPARENT) => Array.from({ length: ROWS }, () => Array(COLS).fill(bg));
+/** One logical pixel (or a block of them) on the card grid. */
+const px = (gx, gy, gw, gh, fill) => rect(gx * S, gy * S, gw * S, gh * S, fill);
 
-function fill(cv, x, y, w, h, ch) {
-  for (let j = Math.max(0, y); j < Math.min(ROWS, y + h); j += 1) {
-    for (let i = Math.max(0, x); i < Math.min(COLS, x + w); i += 1) cv[j][i] = ch;
-  }
-}
-
-/** Paint a sprite at (x, y). `subs` swaps placeholder chars for palette keys. */
-function stamp(cv, sprite, x, y, subs = {}) {
-  sprite.forEach((row, j) => {
-    [...row].forEach((raw, i) => {
-      const ch = subs[raw] ?? raw;
-      if (ch === TRANSPARENT) return;
-      const px = x + i;
-      const py = y + j;
-      if (px >= 0 && px < COLS && py >= 0 && py < ROWS) cv[py][px] = ch;
+/** Paint a row-string sprite. Digits/letters map through `palette`; `.` is skip; `,` is transparent skip. */
+function sprite(ox, oy, rows, palette) {
+  let out = '';
+  rows.forEach((row, dy) => {
+    [...row].forEach((ch, dx) => {
+      if (ch === '.' || ch === ' ') return;
+      const fill = palette[ch];
+      if (fill) out += px(ox + dx, oy + dy, 1, 1, fill);
     });
   });
+  return out;
 }
 
-/** Turn the grid into SVG rects, merging horizontal runs of one colour. */
-function paint(cv) {
-  const out = [];
-  for (let j = 0; j < ROWS; j += 1) {
-    let i = 0;
-    while (i < COLS) {
-      const ch = cv[j][i];
-      let run = 1;
-      while (i + run < COLS && cv[j][i + run] === ch) run += 1;
-      if (ch !== TRANSPARENT && PAL[ch]) {
-        out.push(`<rect x="${ART_X + i * PX}" y="${ART_Y + j * PX}" width="${run * PX}" height="${PX}" fill="${PAL[ch]}"/>`);
-      }
-      i += run;
-    }
+const frame = () =>
+  rect(0, 0, W, H, C.cream) +
+  rect(S, S, W - 2 * S, H - 2 * S, C.ink) +
+  rect(2 * S, 2 * S, W - 4 * S, H - 4 * S, C.parchment);
+
+const sceneBox = (fill) => px(4, 6, 42, 68, fill);
+
+const groundBand = (gy = 52, fill = C.grass, dark = C.grassDark) =>
+  // The art window starts at row 6 and is 68 rows tall, ending at row 74.
+  // Measure from that actual edge so no parchment shows above the title plate.
+  px(4, gy, 42, 74 - gy, fill) + px(4, gy, 42, 1, dark);
+
+/** Sky fills from the art top down to `toGy` so it meets `groundBand(toGy)`. */
+const skyBand = (fill = C.sky, toGy = 52) => px(4, 6, 42, toGy - 6, fill);
+
+// --- tiny props -------------------------------------------------------------
+
+const sun = (gx = 36, gy = 10) =>
+  px(gx, gy, 6, 6, C.gold) +
+  px(gx + 1, gy + 1, 4, 4, C.goldBright) +
+  px(gx - 2, gy + 2, 2, 2, C.gold) +
+  px(gx + 6, gy + 2, 2, 2, C.gold) +
+  px(gx + 2, gy - 2, 2, 2, C.gold) +
+  px(gx + 2, gy + 6, 2, 2, C.gold);
+
+const moon = (gx = 34, gy = 10) =>
+  px(gx, gy, 6, 6, C.white) +
+  px(gx + 2, gy + 1, 4, 4, C.night);
+
+const starPx = (gx, gy, fill = C.goldBright) =>
+  px(gx + 1, gy, 1, 3, fill) + px(gx, gy + 1, 3, 1, fill);
+
+const mountain = (gx, gy, w = 12, h = 10, fill = C.stoneDark) => {
+  let out = '';
+  for (let i = 0; i < h; i += 1) {
+    const half = Math.floor(((i + 1) / h) * (w / 2));
+    out += px(gx + Math.floor(w / 2) - half, gy + i, half * 2 + 1, 1, fill);
   }
-  return out.join('');
-}
-
-// --- 4x5 pixel font --------------------------------------------------------
-// Three pixels wide is too narrow to keep U/V/W/M apart, so glyphs are four
-// wide with one pixel of tracking.
-
-const GLYPH_W = 4;
-const ADVANCE = GLYPH_W + 1;
-
-const FONT = {
-  A: ['0110', '1001', '1111', '1001', '1001'], B: ['1110', '1001', '1110', '1001', '1110'],
-  C: ['0111', '1000', '1000', '1000', '0111'], D: ['1110', '1001', '1001', '1001', '1110'],
-  E: ['1111', '1000', '1110', '1000', '1111'], F: ['1111', '1000', '1110', '1000', '1000'],
-  G: ['0111', '1000', '1011', '1001', '0111'], H: ['1001', '1001', '1111', '1001', '1001'],
-  I: ['1110', '0100', '0100', '0100', '1110'], J: ['0011', '0001', '0001', '1001', '0110'],
-  K: ['1001', '1010', '1100', '1010', '1001'], L: ['1000', '1000', '1000', '1000', '1111'],
-  M: ['1111', '1111', '1001', '1001', '1001'], N: ['1001', '1101', '1011', '1001', '1001'],
-  O: ['0110', '1001', '1001', '1001', '0110'], P: ['1110', '1001', '1110', '1000', '1000'],
-  Q: ['0110', '1001', '1001', '1011', '0111'], R: ['1110', '1001', '1110', '1010', '1001'],
-  S: ['0111', '1000', '0110', '0001', '1110'], T: ['1111', '0100', '0100', '0100', '0100'],
-  U: ['1001', '1001', '1001', '1001', '1111'], V: ['1001', '1001', '1001', '1001', '0110'],
-  W: ['1001', '1001', '1111', '1111', '0110'], X: ['1001', '1001', '0110', '1001', '1001'],
-  Y: ['1001', '1001', '0110', '0100', '0100'], Z: ['1111', '0001', '0110', '1000', '1111'],
-  0: ['0110', '1001', '1001', '1001', '0110'], 1: ['0010', '0110', '0010', '0010', '0111'],
-  2: ['1110', '0001', '0110', '1000', '1111'], 3: ['1110', '0001', '0110', '0001', '1110'],
-  4: ['1001', '1001', '1111', '0001', '0001'], 5: ['1111', '1000', '1110', '0001', '1110'],
-  6: ['0110', '1000', '1110', '1001', '0110'], 7: ['1111', '0001', '0010', '0100', '0100'],
-  8: ['0110', '1001', '0110', '1001', '0110'], 9: ['0110', '1001', '0111', '0001', '0110'],
-  ' ': ['0000', '0000', '0000', '0000', '0000'], '-': ['0000', '0000', '1111', '0000', '0000'],
+  out += px(gx + Math.floor(w / 2) - 1, gy, 2, 2, C.white);
+  return out;
 };
 
-const textWidth = (s, scale) => (s.length * ADVANCE - 1) * scale;
+const tree = (gx, gy) =>
+  px(gx + 2, gy + 6, 2, 5, C.dirtDark) +
+  px(gx, gy + 1, 6, 5, C.grassDark) +
+  px(gx + 1, gy, 4, 2, C.leaf) +
+  px(gx + 1, gy + 3, 4, 2, C.leaf);
 
-/** Draw a string in the pixel font, centred on `cx`, top at `y`. */
-function pixelText(s, cx, y, scale, colour) {
-  const x0 = Math.round(cx - textWidth(s, scale) / 2);
-  const out = [];
-  [...s].forEach((chRaw, n) => {
-    const glyph = FONT[chRaw] || FONT[' '];
-    glyph.forEach((row, j) => {
-      let i = 0;
-      while (i < GLYPH_W) {
-        if (row[i] === '1') {
-          let run = 1;
-          while (i + run < GLYPH_W && row[i + run] === '1') run += 1;
-          out.push(`<rect x="${x0 + n * ADVANCE * scale + i * scale}" y="${y + j * scale}" width="${run * scale}" height="${scale}" fill="${colour}"/>`);
-          i += run;
-        } else i += 1;
-      }
-    });
-  });
-  return out.join('');
-}
+const heart = (gx, gy) =>
+  px(gx, gy + 1, 2, 2, C.heart) +
+  px(gx + 3, gy + 1, 2, 2, C.heart) +
+  px(gx, gy + 2, 5, 2, C.heart) +
+  px(gx + 1, gy + 4, 3, 1, C.heart) +
+  px(gx + 2, gy + 5, 1, 1, C.heart);
 
-/** Greedy wrap onto at most two lines of `max` characters. */
-function wrap(s, max) {
-  const lines = [''];
-  for (const word of s.split(' ')) {
-    const line = lines[lines.length - 1];
-    if (!line) lines[lines.length - 1] = word;
-    else if (line.length + 1 + word.length <= max) lines[lines.length - 1] = `${line} ${word}`;
-    else lines.push(word);
+const gem = (gx, gy, fill = C.rupee) =>
+  px(gx + 1, gy, 2, 1, fill) +
+  px(gx, gy + 1, 4, 3, fill) +
+  px(gx + 1, gy + 4, 2, 1, fill) +
+  px(gx + 1, gy + 1, 1, 1, C.white);
+
+/** Chunky adventurer in a green tunic — generic hero, not a franchise sprite. */
+const hero = (gx, gy, { facing = 'front', hat = true, arm = 'down' } = {}) => {
+  const P = {
+    k: C.ink,
+    s: C.flesh,
+    d: C.fleshDark,
+    g: C.tunic,
+    G: C.greenDark,
+    h: C.hair,
+    c: C.greenHero,
+    C: C.leaf,
+    w: C.white,
+    b: C.blueDark,
+    B: C.blue,
+    o: C.gold,
+  };
+  // Pointed cap + rounded face reads as cartoony adventure hero at card size.
+  const rows = hat
+    ? [
+        '....k....',
+        '...kCk...',
+        '..kCCCk..',
+        '.kCCCCCk.',
+        'kkCsssCkk',
+        '.ksssssk.',
+        '..s.s.s..',
+        '..kgggk..',
+        '.kgggggk.',
+        'kggwggggk',
+        '.kgggggk.',
+        '..G...G..',
+        '..b...b..',
+        '..B...B..',
+      ]
+    : [
+        '...hhh...',
+        '..hsssh..',
+        '.hsssssh.',
+        '..s.s.s..',
+        '..kgggk..',
+        '.kgggggk.',
+        'kggwggggk',
+        '.kgggggk.',
+        '..G...G..',
+        '..b...b..',
+        '..B...B..',
+      ];
+  let out = sprite(gx, gy, rows, P);
+  if (arm === 'up') {
+    out += px(gx, gy + 7, 1, 4, C.flesh) + px(gx + 8, gy + 7, 1, 4, C.flesh);
+    out += px(gx - 1, gy + 6, 1, 1, C.flesh) + px(gx + 9, gy + 6, 1, 1, C.flesh);
   }
-  return lines.slice(0, 2);
-}
-
-// --- sprites ----------------------------------------------------------------
-// 'C' is a placeholder for the robe colour, swapped in at stamp time.
-
-const S = {
-  figure: [
-    '__0000__', '_0ffff0_', '_0f00f0_', '_0ffff0_', '__CCCC__', '_fCCCCf_',
-    '_fCCCCf_', '__CCCC__', '__CCCC__', '__CCCC__', '__C__C__', '__T__T__',
-  ],
-  figureUp: [
-    'f_0000_f', 'f0ffff0f', 'f0f00f0f', '_0ffff0_', '__CCCC__', '__CCCC__',
-    '__CCCC__', '__CCCC__', '__CCCC__', '__CCCC__', '__C__C__', '__T__T__',
-  ],
-  figureOut: [
-    '__0000__', '_0ffff0_', '_0f00f0_', '_0ffff0_', 'f_CCCC_f', 'ffCCCCff',
-    '__CCCC__', '__CCCC__', '__CCCC__', '__CCCC__', '__C__C__', '__T__T__',
-  ],
-  figureHung: [
-    '__T__T__', '__C__C__', '__CCCC__', '__CCCC__', '__CCCC__', '_fCCCCf_',
-    '_fCCCCf_', '__CCCC__', '_0ffff0_', '_0f00f0_', '_0ffff0_', '__0000__',
-  ],
-  skeleton: [
-    '__0000__', '_0wwww0_', '_0w00w0_', '_0wwww0_', '__KKKK__', '_wKKKKw_',
-    '_wKKKKw_', '__KKKK__', '__KKKK__', '__KKKK__', '__K__K__', '__0__0__',
-  ],
-  child: ['_0000_', '0ffff0', '0f00f0', '_CCCC_', 'fCCCCf', '_CCCC_', '_C__C_', '_0__0_'],
-  crown: ['y_yy_y', 'yyyyyy'],
-  horns: ['p_____p', 'pp___pp'],
-  wings: ['w_______w', 'ww_____ww', 'www___www'],
-  sun: [
-    '_Y__Y__Y_', '__yyyyy__', '_yyyyyyy_', 'Yyy0y0yyY', '_yyyyyyy_',
-    'Yyy000yyY', '_yyyyyyy_', '__yyyyy__', '_Y__Y__Y_',
-  ],
-  moon: ['__ww__', '_www__', 'ww____', 'ww____', 'ww____', 'ww____', '_www__', '__ww__'],
-  fullMoon: ['_wwww_', 'wwwwww', 'ww0w0w', 'wwwwww', 'ww000w', '_wwww_'],
-  star: ['__Y__', '_YYY_', 'YYYYY', '_YYY_', '__Y__'],
-  bigStar: ['___Y___', '_Y_Y_Y_', '__YYY__', 'YYYYYYY', '__YYY__', '_Y_Y_Y_', '___Y___'],
-  tower: [
-    'k_kk_kk_', 'kkkkkkkk', '0KkkkkK0', '_KkrrkK_', '_KkkkkK_', '_KkkkkK_',
-    '_KkrrkK_', '_KkkkkK_', '_KkkkkK_', '_KkkkkK_', '_KkrrkK_', '_KkkkkK_',
-    '_KkkkkK_', '0KkkkkK0',
-  ],
-  cup: ['_yyyyy_', 'yyyyyyy', '_0yyy0_', '__yyy__', '___y___', '___y___', '_yyyyy_', 'yyyyyyy'],
-  sword: ['__k__', '__k__', '_kkk_', '_kkk_', '_kkk_', '_kkk_', '_kkk_', '_kkk_', 'TTTTT', '__T__', '__T__', '__y__'],
-  wand: ['g_g', 'gTg', '_T_', '_T_', '_T_', '_T_', '_T_', '_T_', '_T_', '_T_', '_T_'],
-  pentacle: ['_yyyyy_', 'yy000yy', 'y00y00y', 'y0yyy0y', 'yy0y0yy', 'y0y_y0y', '_yyyyy_'],
-  wandS: ['_g_g_', '__T__', '__T__', '__T__', '__T__', '__T__'],
-  cupS: ['yyyyy', 'yyyyy', '_yyy_', '__y__', '__y__', 'yyyyy'],
-  swordS: ['__k__', '__k__', '_kkk_', '_kkk_', 'TTTTT', '__T__'],
-  pentS: ['_yyy_', 'yy0yy', 'y0y0y', 'yy0yy', 'y0_0y', '_yyy_'],
-  tree: ['__ggg__', '_ggggg_', 'ggggggg', '_ggggg_', 'ggggggg', '__TTT__', '__TTT__'],
-  lion: ['_oo____oo_', 'oooooooooo', 'oo0oooo0oo', 'oooooooooo', '_ooo00ooo_', '__oooooo__', '__o0__0o__'],
-  horse: ['__________w_', '_________www', '_wwwwwwwww0w', 'wwwwwwwwwwww', 'wwwwwwwwwww_', '_w_ww__ww_w_', '_w_ww__ww_w_', '_0_00__00_0_'],
-  dog: ['w_w___', 'wwwww_', 'wwwwww', 'w_w_w_', '0_0_0_'],
-  wheel: [
-    '___yyyyy___', '_yyyyyyyyy_', '_yyy000yyy_', 'yyy00000yyy', 'yyy00y00yyy',
-    'yyy0yyy0yyy', 'yyy00y00yyy', 'yyy00000yyy', '_yyy000yyy_', '_yyyyyyyyy_',
-    '___yyyyy___',
-  ],
-  heart: ['_rr___rr_', 'rrrrrrrrr', 'rrrrrrrrr', 'rrrrrrrrr', '_rrrrrrr_', '__rrrrr__', '___rrr___', '____r____'],
-  scales: ['_____0_____', '00000000000', '0___0____0_', '0___0____0_', 'yyy_0__yyy_', '_y__0___y__'],
-  bolt: ['___YY', '__YY_', '_YY__', 'YYYY_', '__YY_', '_YY__', 'YY___'],
-  chest: ['TTTTTTTT', 'TyyyyyyT', 'TTTTTTTT', 'TTTyyTTT', 'TTTTTTTT'],
+  if (arm === 'out') {
+    out += px(gx - 2, gy + 8, 3, 1, C.flesh) + px(gx + 8, gy + 8, 3, 1, C.flesh);
+  }
+  if (facing === 'side') out += px(gx + 6, gy + 5, 1, 1, C.ink);
+  return out;
 };
 
-const mountains = (cv, y, ch) => {
-  const peaks = [[0, 4], [5, 6], [12, 5], [16, 4]];
-  for (const [x, h] of peaks) {
-    for (let j = 0; j < h; j += 1) {
-      fill(cv, x + (h - j) - 1, y + j, (j + 1) * 2, 1, ch);
-    }
+const figureRobed = (gx, gy, robe, { crown = false, tall = 16 } = {}) => {
+  let out = '';
+  if (crown) {
+    out += px(gx + 1, gy - 3, 7, 2, C.gold) + px(gx + 2, gy - 4, 1, 1, C.goldBright) +
+      px(gx + 4, gy - 5, 1, 2, C.goldBright) + px(gx + 6, gy - 4, 1, 1, C.goldBright);
   }
-  fill(cv, 0, y + 6, COLS, 1, ch);
+  out += px(gx + 2, gy, 5, 4, C.flesh) + px(gx + 3, gy + 1, 1, 1, C.ink) + px(gx + 5, gy + 1, 1, 1, C.ink);
+  out += px(gx + 3, gy + 3, 2, 1, C.fleshDark);
+  out += px(gx, gy + 4, 9, tall - 6, robe);
+  out += px(gx + 1, gy + 5, 7, 2, robe === C.white ? C.cream : C.ink);
+  out += px(gx + 1, gy + tall - 2, 2, 2, C.ink) + px(gx + 6, gy + tall - 2, 2, 2, C.ink);
+  return out;
 };
 
-const pillars = (cv, ch1, ch2) => {
-  fill(cv, 1, 2, 3, 22, ch1);
-  fill(cv, 16, 2, 3, 22, ch2);
+const cloud = (gx, gy) =>
+  px(gx + 2, gy, 4, 1, C.white) + px(gx, gy + 1, 8, 2, C.white) + px(gx + 1, gy + 3, 6, 1, C.white);
+
+const bush = (gx, gy) =>
+  px(gx + 1, gy, 4, 1, C.leaf) + px(gx, gy + 1, 6, 3, C.grass) + px(gx + 1, gy + 2, 4, 1, C.grassDark);
+
+// --- suit emblems -----------------------------------------------------------
+
+const wand = (gx, gy) =>
+  px(gx + 1, gy, 1, 10, C.dirt) +
+  px(gx, gy, 3, 2, C.leaf) +
+  px(gx + 1, gy - 1, 1, 1, C.leaf);
+
+const cup = (gx, gy) =>
+  px(gx, gy, 5, 1, C.gold) +
+  px(gx, gy + 1, 5, 4, C.gold) +
+  px(gx + 1, gy + 5, 3, 1, C.gold) +
+  px(gx + 2, gy + 6, 1, 2, C.gold) +
+  px(gx + 1, gy + 8, 3, 1, C.gold) +
+  px(gx + 1, gy + 2, 3, 2, C.goldBright);
+
+const sword = (gx, gy) =>
+  px(gx + 1, gy, 1, 9, C.grey) +
+  px(gx + 1, gy, 1, 1, C.white) +
+  px(gx, gy + 8, 3, 1, C.dirtDark) +
+  px(gx + 1, gy + 9, 1, 2, C.dirtDark);
+
+const pentacle = (gx, gy) =>
+  px(gx + 1, gy, 4, 1, C.gold) +
+  px(gx, gy + 1, 6, 4, C.gold) +
+  px(gx + 1, gy + 5, 4, 1, C.gold) +
+  px(gx + 2, gy + 2, 2, 2, C.dirtDark) +
+  px(gx + 1, gy + 3, 1, 1, C.dirtDark) +
+  px(gx + 4, gy + 3, 1, 1, C.dirtDark);
+
+const EMBLEM = {
+  wands: (x, y) => wand(x, y),
+  cups: (x, y) => cup(x, y),
+  swords: (x, y) => sword(x, y),
+  pentacles: (x, y) => pentacle(x, y),
+};
+
+const PIP_LAYOUT = {
+  1: [[22, 32]],
+  2: [[22, 22], [22, 44]],
+  3: [[22, 20], [14, 44], [30, 44]],
+  4: [[14, 22], [30, 22], [14, 44], [30, 44]],
+  5: [[14, 20], [30, 20], [22, 34], [14, 48], [30, 48]],
+  6: [[14, 18], [30, 18], [14, 34], [30, 34], [14, 50], [30, 50]],
+  7: [[14, 16], [30, 16], [22, 26], [14, 36], [30, 36], [14, 52], [30, 52]],
+  8: [[14, 14], [30, 14], [14, 28], [30, 28], [14, 42], [30, 42], [14, 56], [30, 56]],
+  9: [[14, 14], [30, 14], [14, 28], [30, 28], [22, 36], [14, 44], [30, 44], [14, 58], [30, 58]],
+  10: [[14, 12], [30, 12], [14, 24], [30, 24], [22, 18], [22, 42], [14, 36], [30, 36], [14, 54], [30, 54]],
+};
+
+const COURT_SEAT = {
+  11: (suit) => hero(12, 38, { hat: false }) + EMBLEM[suit](34, 34),
+  12: (suit) => px(8, 52, 16, 4, C.dirt) + hero(10, 32) + EMBLEM[suit](34, 30),
+  13: (suit) =>
+    px(10, 34, 14, 20, C.stone) + px(12, 38, 4, 5, C.night) + figureRobed(14, 26, C.blue, { crown: true, tall: 20 }) + EMBLEM[suit](34, 32),
+  14: (suit) =>
+    px(8, 32, 18, 22, C.stoneDark) + px(10, 36, 5, 6, C.night) + figureRobed(13, 24, C.red, { crown: true, tall: 22 }) + EMBLEM[suit](34, 30),
 };
 
 // --- Major Arcana scenes ----------------------------------------------------
 
 const MAJOR_SCENE = {
-  0: (cv) => { fill(cv, 0, 0, COLS, 20, 'b'); fill(cv, 0, 20, COLS, 6, 't'); mountains(cv, 13, 'P'); stamp(cv, S.sun, 10, 1); stamp(cv, S.figureUp, 3, 12, { C: 'y' }); stamp(cv, S.dog, 13, 19); },
-  1: (cv) => { fill(cv, 0, 0, COLS, 21, 'y'); fill(cv, 0, 21, COLS, 5, 'g'); stamp(cv, S.star, 8, 1); stamp(cv, S.figureUp, 6, 8, { C: 'w' }); fill(cv, 3, 20, 14, 1, 'T'); stamp(cv, S.cupS, 4, 14); stamp(cv, S.pentS, 12, 14); },
-  2: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'N'); pillars(cv, '0', 'w'); stamp(cv, S.figure, 6, 9, { C: 'B' }); stamp(cv, S.moon, 7, 1); },
-  3: (cv) => { fill(cv, 0, 0, COLS, 18, 'b'); fill(cv, 0, 18, COLS, 8, 'y'); stamp(cv, S.tree, 0, 11); stamp(cv, S.tree, 13, 11); stamp(cv, S.figure, 6, 11, { C: 'w' }); stamp(cv, S.crown, 7, 9); },
-  4: (cv) => { fill(cv, 0, 0, COLS, 21, 'R'); fill(cv, 0, 21, COLS, 5, 'T'); fill(cv, 4, 7, 12, 14, 'K'); stamp(cv, S.figure, 6, 11, { C: 'r' }); stamp(cv, S.crown, 7, 9); },
-  5: (cv) => { fill(cv, 0, 0, COLS, 21, 'k'); fill(cv, 0, 21, COLS, 5, 'T'); pillars(cv, 'K', 'K'); stamp(cv, S.figureUp, 6, 8, { C: 'r' }); stamp(cv, S.crown, 7, 6); stamp(cv, S.child, 1, 18, { C: 'w' }); stamp(cv, S.child, 13, 18, { C: 'w' }); },
-  6: (cv) => { fill(cv, 0, 0, COLS, 21, 'b'); fill(cv, 0, 21, COLS, 5, 'g'); stamp(cv, S.sun, 6, 0); stamp(cv, S.tree, 0, 10); stamp(cv, S.tree, 13, 10); stamp(cv, S.figure, 3, 12, { C: 'f' }); stamp(cv, S.figure, 10, 12, { C: 'f' }); },
-  7: (cv) => { fill(cv, 0, 0, COLS, 20, 'b'); fill(cv, 0, 20, COLS, 6, 't'); fill(cv, 4, 15, 12, 7, 'K'); stamp(cv, S.figure, 6, 6, { C: 'B' }); stamp(cv, S.crown, 7, 4); fill(cv, 2, 22, 5, 3, 'w'); fill(cv, 13, 22, 5, 3, '0'); },
-  8: (cv) => { fill(cv, 0, 0, COLS, 20, 'Y'); fill(cv, 0, 20, COLS, 6, 'g'); stamp(cv, S.figure, 2, 10, { C: 'w' }); stamp(cv, S.lion, 9, 14); stamp(cv, S.star, 4, 5); },
-  9: (cv) => { fill(cv, 0, 0, COLS, 21, 'N'); fill(cv, 0, 21, COLS, 5, 'w'); stamp(cv, S.figure, 5, 10, { C: 'K' }); stamp(cv, S.bigStar, 12, 9); },
-  10: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'N'); stamp(cv, S.wheel, 4, 8); stamp(cv, S.star, 1, 1); stamp(cv, S.star, 14, 1); stamp(cv, S.star, 1, 20); stamp(cv, S.star, 14, 20); },
-  11: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'P'); pillars(cv, 'k', 'k'); stamp(cv, S.figure, 6, 11, { C: 'r' }); stamp(cv, S.crown, 7, 9); stamp(cv, S.scales, 5, 4); },
-  12: (cv) => { fill(cv, 0, 0, COLS, 21, 'b'); fill(cv, 0, 21, COLS, 5, 'g'); fill(cv, 3, 1, 14, 1, 'T'); fill(cv, 9, 2, 1, 3, 'T'); stamp(cv, S.figureHung, 6, 5, { C: 'B' }); },
-  13: (cv) => { fill(cv, 0, 0, COLS, 21, 'k'); fill(cv, 0, 21, COLS, 5, 'T'); stamp(cv, S.horse, 3, 15); stamp(cv, S.skeleton, 5, 5); fill(cv, 14, 3, 1, 8, '0'); fill(cv, 15, 3, 4, 4, '0'); },
-  14: (cv) => { fill(cv, 0, 0, COLS, 21, 'b'); fill(cv, 0, 21, COLS, 5, 'g'); stamp(cv, S.figureOut, 6, 11, { C: 'w' }); stamp(cv, S.wings, 5, 15); stamp(cv, S.cupS, 1, 14); stamp(cv, S.cupS, 14, 16); },
-  15: (cv) => { fill(cv, 0, 0, COLS, ROWS, '0'); stamp(cv, S.figure, 6, 6, { C: 'p' }); stamp(cv, S.horns, 6, 4); stamp(cv, S.child, 1, 18, { C: 'R' }); stamp(cv, S.child, 13, 18, { C: 'R' }); fill(cv, 6, 18, 8, 1, 'k'); },
-  16: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'N'); stamp(cv, S.tower, 6, 10); stamp(cv, S.bolt, 8, 1); stamp(cv, S.child, 0, 15, { C: 'B' }); stamp(cv, S.child, 14, 18, { C: 'r' }); },
-  17: (cv) => { fill(cv, 0, 0, COLS, 21, 'N'); fill(cv, 0, 21, COLS, 5, 'B'); stamp(cv, S.bigStar, 6, 1); stamp(cv, S.star, 1, 3); stamp(cv, S.star, 14, 3); stamp(cv, S.star, 3, 9); stamp(cv, S.star, 15, 9); stamp(cv, S.figureOut, 6, 11, { C: 'w' }); },
-  18: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'N'); stamp(cv, S.fullMoon, 7, 1); stamp(cv, S.tower, 0, 9); stamp(cv, S.tower, 12, 9); fill(cv, 9, 9, 2, 17, 't'); stamp(cv, S.dog, 7, 21); },
-  19: (cv) => { fill(cv, 0, 0, COLS, 20, 'b'); fill(cv, 0, 20, COLS, 6, 'g'); stamp(cv, S.sun, 6, 1); fill(cv, 0, 17, COLS, 2, 'G'); stamp(cv, S.child, 7, 15, { C: 'r' }); },
-  20: (cv) => { fill(cv, 0, 0, COLS, 20, 'k'); fill(cv, 0, 20, COLS, 6, 'B'); stamp(cv, S.figureOut, 6, 4, { C: 'w' }); stamp(cv, S.wings, 5, 8); stamp(cv, S.child, 1, 18, { C: 'k' }); stamp(cv, S.child, 13, 18, { C: 'k' }); },
-  21: (cv) => { fill(cv, 0, 0, COLS, ROWS, 'b'); fill(cv, 4, 4, 12, 18, 'g'); fill(cv, 4, 4, 2, 2, 'b'); fill(cv, 14, 4, 2, 2, 'b'); fill(cv, 4, 20, 2, 2, 'b'); fill(cv, 14, 20, 2, 2, 'b'); fill(cv, 6, 6, 8, 14, 'b'); stamp(cv, S.figureUp, 6, 8, { C: 'p' }); stamp(cv, S.star, 0, 0); stamp(cv, S.star, 15, 0); stamp(cv, S.star, 0, 21); stamp(cv, S.star, 15, 21); },
+  0: () => skyBand(C.sky, 56) + cloud(6, 10) + cloud(30, 14) + groundBand(56, C.sand, C.dirt) +
+    mountain(28, 28, 14, 12, C.violet) + sun(8, 10) + bush(36, 52) +
+    hero(16, 38, { arm: 'out' }) + px(30, 58, 3, 2, C.white) + gem(38, 46, C.rupee),
+  1: () => skyBand(C.sky, 54) + sun(34, 10) + cloud(6, 12) + groundBand(54, C.grassDark, C.greenDark) +
+    px(10, 48, 30, 4, C.dirtDark) + px(12, 46, 26, 2, C.dirt) +
+    hero(17, 30, { hat: false, arm: 'up' }) +
+    cup(8, 40) + wand(36, 36) + sword(6, 48) + pentacle(34, 48) +
+    px(20, 10, 8, 2, C.goldBright) + px(18, 12, 2, 2, C.gold) + px(28, 12, 2, 2, C.gold),
+  2: () => sceneBox(C.night) + px(8, 18, 5, 42, C.ink) + px(37, 18, 5, 42, C.white) +
+    figureRobed(17, 26, C.blue, { tall: 24 }) + moon(20, 10) + starPx(10, 14) + starPx(34, 16, C.white) +
+    px(18, 48, 12, 2, C.violet),
+  3: () => skyBand(C.sky, 50) + sun(34, 10) + cloud(8, 12) + groundBand(50, C.sand, C.dirt) +
+    tree(4, 36) + tree(38, 38) + bush(14, 48) + bush(28, 48) +
+    figureRobed(17, 26, C.white, { crown: true, tall: 22 }) + heart(8, 26) + heart(36, 26),
+  4: () => skyBand(C.redDark, 54) + groundBand(54, C.dirt, C.dirtDark) + mountain(4, 22, 16, 14, C.stoneDark) +
+    mountain(30, 20, 14, 16, C.stone) + px(13, 32, 20, 22, C.stone) + px(15, 36, 4, 5, C.night) +
+    figureRobed(17, 24, C.red, { crown: true, tall: 22 }),
+  5: () => skyBand(C.stone, 54) + cloud(20, 10) + groundBand(54, C.dirt, C.dirtDark) +
+    px(7, 16, 6, 38, C.stoneDark) + px(37, 16, 6, 38, C.stoneDark) +
+    figureRobed(17, 22, C.violet, { crown: true, tall: 24 }) +
+    px(18, 56, 12, 2, C.gold) + hero(6, 48, { hat: false }) + hero(32, 48, { hat: false }),
+  6: () => skyBand(C.sky, 56) + sun(20, 8) + cloud(4, 14) + groundBand(56) +
+    tree(2, 40) + tree(40, 40) + bush(20, 54) +
+    hero(8, 40, { hat: false }) + hero(28, 40, { hat: false }) + heart(20, 28),
+  7: () => skyBand(C.sky, 56) + cloud(30, 10) + groundBand(56, C.dirt, C.dirtDark) +
+    px(13, 36, 22, 16, C.stone) + px(15, 40, 5, 5, C.night) + px(28, 40, 5, 5, C.night) +
+    figureRobed(17, 20, C.blue, { crown: true, tall: 18 }) +
+    px(8, 52, 7, 4, C.white) + px(33, 52, 7, 4, C.ink) + gem(21, 32, C.gold),
+  8: () => skyBand(C.gold, 54) + groundBand(54) + bush(4, 50) +
+    hero(10, 36, { arm: 'out' }) +
+    px(28, 46, 12, 8, C.dirt) + px(30, 42, 8, 4, C.dirtDark) + px(32, 40, 3, 2, C.ink) +
+    px(18, 12, 10, 2, C.goldBright) + heart(6, 24),
+  9: () => sceneBox(C.nightDeep) + groundBand(54, C.stone, C.stoneDark) +
+    figureRobed(17, 24, C.grey, { tall: 22 }) + starPx(34, 16) + starPx(10, 20, C.white) +
+    lantern(22, 38) + mountain(32, 40, 10, 8, C.stoneDark),
+  10: () => sceneBox(C.night) +
+    px(15, 22, 20, 20, C.gold) + px(18, 25, 14, 14, C.parchment) + px(22, 29, 6, 6, C.ink) +
+    starPx(8, 12, C.white) + starPx(38, 12, C.white) + starPx(8, 56, C.white) + starPx(38, 56, C.white) +
+    gem(8, 34) + gem(36, 34, C.gold) + gem(22, 14, C.heart),
+  11: () => skyBand(C.violet, 54) + groundBand(54, C.stone, C.stoneDark) +
+    px(7, 16, 5, 38, C.stoneDark) + px(38, 16, 5, 38, C.stoneDark) +
+    figureRobed(17, 24, C.red, { crown: true, tall: 22 }) + sword(10, 28) +
+    px(28, 34, 8, 2, C.gold) + px(28, 38, 2, 2, C.gold) + px(34, 38, 2, 2, C.gold),
+  12: () => skyBand(C.sky, 58) + cloud(8, 10) + groundBand(58) + bush(34, 54) +
+    px(10, 14, 30, 3, C.dirtDark) + px(23, 17, 3, 8, C.dirtDark) +
+    el('g', { transform: `rotate(180 ${25 * S} ${40 * S})` }, hero(17, 26, { hat: false })) +
+    gem(22, 16, C.goldBright),
+  13: () => skyBand(C.stoneDark, 54) + groundBand(54, C.dirtDark, C.ink) +
+    sun(20, 48) + px(12, 40, 24, 10, C.white) + figureRobed(16, 18, C.ink, { tall: 20 }) +
+    px(34, 20, 2, 18, C.ink) + flag(36, 20),
+  14: () => skyBand(C.sky, 54) + sun(34, 10) + cloud(6, 12) + groundBand(54) + bush(4, 50) +
+    figureRobed(17, 24, C.white, { tall: 22 }) +
+    cup(8, 34) + cup(34, 36) + px(13, 38, 22, 2, C.water) + gem(22, 16, C.gold),
+  15: () => sceneBox(C.ink) + figureRobed(17, 18, C.violetDark, { tall: 20 }) +
+    px(15, 14, 4, 4, C.grey) + px(29, 14, 4, 4, C.grey) +
+    hero(6, 46, { hat: false }) + hero(32, 46, { hat: false }) +
+    px(18, 40, 12, 2, C.red) + starPx(10, 10, C.red) + starPx(36, 10, C.red),
+  16: () => sceneBox(C.nightDeep) +
+    px(17, 20, 14, 34, C.stone) + px(15, 18, 18, 3, C.dirtDark) + px(20, 28, 4, 5, C.night) +
+    px(22, 18, 4, 2, C.gold) + bolt(28, 6) + bolt(8, 12) +
+    px(8, 44, 5, 5, C.flesh) + px(36, 48, 5, 5, C.flesh),
+  17: () => sceneBox(C.night) +
+    starPx(22, 10, C.goldBright) + starPx(10, 14, C.white) + starPx(36, 12, C.white) +
+    starPx(14, 24, C.white) + starPx(34, 24, C.gold) +
+    px(4, 52, 42, 12, C.water) + px(4, 52, 42, 1, C.waterDeep) +
+    hero(17, 36, { hat: false, arm: 'out' }) + gem(8, 56, C.rupee),
+  18: () => sceneBox(C.nightDeep) + moon(20, 8) +
+    px(7, 28, 10, 26, C.stoneDark) + px(33, 28, 10, 26, C.stoneDark) +
+    px(21, 38, 8, 22, C.dirt) + px(18, 58, 14, 4, C.water) +
+    px(22, 56, 4, 2, C.blue) + howl(12, 48) + howl(32, 50),
+  19: () => skyBand(C.gold, 54) + groundBand(54) + sun(17, 8) +
+    px(4, 48, 42, 2, C.leaf) + flower(8, 50) + flower(36, 52) + bush(24, 52) +
+    hero(17, 36, { arm: 'out' }),
+  20: () => skyBand(C.stone, 50) + cloud(8, 10) + px(4, 50, 42, 14, C.water) +
+    figureRobed(17, 14, C.white, { tall: 18 }) +
+    px(12, 50, 24, 12, C.dirtDark) + hero(17, 44, { hat: false, arm: 'up' }) +
+    starPx(8, 12, C.gold) + starPx(38, 12, C.gold),
+  21: () => skyBand(C.sky, 58) + cloud(16, 10) + groundBand(58, C.leaf, C.grassDark) +
+    px(9, 14, 32, 2, C.greenHero) + px(9, 14, 2, 42, C.greenHero) + px(39, 14, 2, 42, C.greenHero) +
+    px(9, 54, 32, 2, C.greenHero) +
+    hero(17, 32, { arm: 'up' }) +
+    starPx(6, 10, C.gold) + starPx(40, 10, C.gold) + starPx(6, 60, C.gold) + starPx(40, 60, C.gold),
 };
 
-// --- Minor Arcana -----------------------------------------------------------
+function lantern(gx, gy) {
+  return px(gx, gy, 3, 4, C.gold) + px(gx + 1, gy + 1, 1, 2, C.goldBright) + px(gx + 1, gy - 2, 1, 2, C.dirtDark);
+}
 
-const EMBLEM = { wands: S.wandS, cups: S.cupS, swords: S.swordS, pentacles: S.pentS };
-const BIG_EMBLEM = { wands: S.wand, cups: S.cup, swords: S.sword, pentacles: S.pentacle };
+function bolt(gx, gy) {
+  return px(gx, gy, 2, 2, C.goldBright) + px(gx - 1, gy + 2, 2, 2, C.gold) + px(gx, gy + 4, 2, 3, C.goldBright) +
+    px(gx + 2, gy + 3, 2, 1, C.gold);
+}
 
-const PIP_POS = {
-  1: [[7, 10]],
-  2: [[7, 4], [7, 15]],
-  3: [[7, 2], [2, 13], [12, 13]],
-  4: [[2, 4], [12, 4], [2, 15], [12, 15]],
-  5: [[2, 3], [12, 3], [7, 10], [2, 17], [12, 17]],
-  6: [[2, 2], [12, 2], [2, 10], [12, 10], [2, 18], [12, 18]],
-  7: [[2, 1], [12, 1], [7, 7], [2, 13], [12, 13], [2, 19], [12, 19]],
-  8: [[2, 1], [12, 1], [2, 7], [12, 7], [2, 13], [12, 13], [2, 19], [12, 19]],
-  9: [[2, 1], [12, 1], [2, 7], [12, 7], [7, 10], [2, 13], [12, 13], [2, 19], [12, 19]],
-  10: [[2, 1], [12, 1], [7, 4], [2, 7], [12, 7], [2, 13], [12, 13], [7, 16], [2, 19], [12, 19]],
-};
+function flag(gx, gy) {
+  return px(gx, gy, 8, 5, C.white) + px(gx + 1, gy + 1, 2, 2, C.red) + px(gx + 4, gy + 1, 2, 2, C.red);
+}
 
-const SUIT_BG = {
-  wands: ['b', 't'],
-  cups: ['b', 'g'],
-  swords: ['K', 'G'],
-  pentacles: ['b', 'T'],
-};
+function howl(gx, gy) {
+  return px(gx, gy + 2, 4, 3, C.grey) + px(gx + 3, gy, 2, 3, C.grey) + px(gx + 4, gy + 1, 1, 1, C.ink);
+}
 
-const COURT = {
-  11: (cv, suit) => { stamp(cv, S.figure, 3, 11, { C: 'g' }); stamp(cv, BIG_EMBLEM[suit], 13, 10); },
-  12: (cv, suit) => { stamp(cv, S.horse, 2, 17); stamp(cv, S.figure, 3, 6, { C: 'r' }); stamp(cv, BIG_EMBLEM[suit], 14, 5); },
-  13: (cv, suit) => { fill(cv, 2, 8, 10, 15, 'T'); stamp(cv, S.figure, 3, 11, { C: 'B' }); stamp(cv, S.crown, 4, 9); stamp(cv, BIG_EMBLEM[suit], 13, 10); },
-  14: (cv, suit) => { fill(cv, 1, 7, 12, 16, 'T'); stamp(cv, S.figure, 3, 11, { C: 'r' }); stamp(cv, S.crown, 4, 9); stamp(cv, BIG_EMBLEM[suit], 14, 9); },
-};
+function flower(gx, gy) {
+  return px(gx + 1, gy, 1, 1, C.red) + px(gx, gy + 1, 3, 1, C.red) + px(gx + 1, gy + 2, 1, 2, C.grassDark);
+}
 
-// Smith's innovation was giving the pips full scenes. A plain emblem grid
-// covers most of them; the ones people recognise by picture get their own.
+// --- special pip scenes -----------------------------------------------------
+
 const PIP_SCENE = {
-  'swords-3': (cv) => { fill(cv, 0, 0, COLS, ROWS, 'K'); stamp(cv, S.heart, 5, 9); stamp(cv, S.sword, 3, 7); stamp(cv, S.sword, 8, 6); stamp(cv, S.sword, 13, 7); },
-  'swords-9': (cv) => {
-    fill(cv, 0, 0, COLS, ROWS, 'N');
-    for (let i = 0; i < 9; i += 1) fill(cv, 3 + (i % 3), 1 + i * 2, 14 - (i % 3), 1, 'k');
-    fill(cv, 2, 19, 16, 7, 'w'); fill(cv, 2, 22, 16, 4, 'r'); fill(cv, 4, 17, 4, 3, 'f');
-  },
-  'wands-10': (cv) => {
-    fill(cv, 0, 0, COLS, 21, 'b'); fill(cv, 0, 21, COLS, 5, 'g');
-    for (let i = 0; i < 10; i += 1) fill(cv, 4 + (i % 5) * 2, 5 + Math.floor(i / 5) * 2, 1, 8, 'T');
-    stamp(cv, S.figure, 6, 14, { C: 'r' });
-  },
-  'pentacles-5': (cv) => {
-    fill(cv, 0, 0, COLS, 21, 'N'); fill(cv, 0, 21, COLS, 5, 'w');
-    fill(cv, 12, 2, 7, 16, 'y');
-    for (let i = 0; i < 5; i += 1) stamp(cv, S.pentS, 13, 2 + i * 3);
-    stamp(cv, S.figure, 1, 12, { C: 'K' }); stamp(cv, S.child, 8, 17, { C: 'T' });
-  },
-  'cups-3': (cv) => {
-    fill(cv, 0, 0, COLS, 21, 'b'); fill(cv, 0, 21, COLS, 5, 'g');
-    stamp(cv, S.figure, 0, 12, { C: 'r' }); stamp(cv, S.figure, 6, 11, { C: 'w' }); stamp(cv, S.figure, 12, 12, { C: 'y' });
-    stamp(cv, S.cupS, 1, 5); stamp(cv, S.cupS, 7, 4); stamp(cv, S.cupS, 13, 5);
-  },
+  'swords-3': () => skyBand(C.stone, 58) + groundBand(58, C.stoneDark, C.ink) +
+    heart(20, 28) + sword(18, 18) + sword(24, 22) + sword(21, 36),
+  'swords-9': () => sceneBox(C.nightDeep) +
+    [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => sword(8 + (i % 3) * 12, 12 + Math.floor(i / 3) * 14)).join('') +
+    px(12, 52, 24, 10, C.parchment) + px(14, 54, 6, 4, C.flesh) + heart(28, 56),
+  'wands-10': () => skyBand(C.sky, 56) + groundBand(56) +
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => wand(8 + (i % 5) * 7, 16 + Math.floor(i / 5) * 12)).join('') +
+    hero(18, 42),
+  'pentacles-5': () => sceneBox(C.night) + groundBand(54, C.stone, C.stoneDark) +
+    px(28, 14, 14, 28, C.gold) + [0, 1, 2, 3, 4].map((i) => pentacle(30, 16 + i * 5)).join('') +
+    hero(8, 42, { hat: false }) + hero(16, 46, { hat: false }),
+  'cups-3': () => skyBand(C.sky, 56) + groundBand(56) +
+    hero(8, 42, { hat: false }) + hero(18, 40) + hero(30, 42, { hat: false }) +
+    cup(10, 28) + cup(20, 24) + cup(32, 28),
 };
-
-// --- card assembly ----------------------------------------------------------
 
 function scene(card) {
-  const cv = canvas();
-  if (card.arcana === 'major') {
-    MAJOR_SCENE[card.number](cv);
-    return cv;
-  }
-  if (PIP_SCENE[card.id]) {
-    PIP_SCENE[card.id](cv);
-    return cv;
-  }
-  const [skyCh, groundCh] = SUIT_BG[card.suit];
-  fill(cv, 0, 0, COLS, 22, skyCh);
-  fill(cv, 0, 22, COLS, 4, groundCh);
-  if (card.number > 10) COURT[card.number](cv, card.suit);
-  else for (const [x, y] of PIP_POS[card.number]) stamp(cv, EMBLEM[card.suit], x, y);
-  return cv;
+  if (card.arcana === 'major') return MAJOR_SCENE[card.number]();
+  if (PIP_SCENE[card.id]) return PIP_SCENE[card.id]();
+  const skyFill = card.suit === 'swords' ? C.stone : card.suit === 'cups' ? C.skyDeep : C.sky;
+  const gFill = card.suit === 'pentacles' ? C.dirt : C.grass;
+  const gDark = card.suit === 'pentacles' ? C.dirtDark : C.grassDark;
+  // Default sky/ground meet at row 52 — no parchment strip in between.
+  const base = skyBand(skyFill) + groundBand(52, gFill, gDark);
+  if (card.number > 10) return base + COURT_SEAT[card.number](card.suit);
+  return base + PIP_LAYOUT[card.number].map(([x, y]) => EMBLEM[card.suit](x, y)).join('');
 }
 
 const titleFor = (card) => (card.arcana === 'major' ? card.name : `${card.rankLabel} of ${card.suitName}`).toUpperCase();
@@ -336,46 +413,67 @@ const numeralFor = (card) => {
   return card.isCourt ? '' : String(card.number);
 };
 
-/** Render one card face as a standalone SVG string. */
-export function cardSVG(card, { reversed = false, width = 200 } = {}) {
-  const title = titleFor(card);
-  const numeral = numeralFor(card);
-  const lines = wrap(title, 11);
-  const titleTop = CARD_H - 4 * PX - lines.length * 18 + 2;
-
-  const frame = [
-    `<rect x="0" y="0" width="${CARD_W}" height="${CARD_H}" fill="${PAL.c}"/>`,
-    `<rect x="${PX}" y="${PX}" width="${CARD_W - 2 * PX}" height="${CARD_H - 2 * PX}" fill="none" stroke="${PAL[0]}" stroke-width="${PX / 2}"/>`,
-    `<rect x="${ART_X - PX / 2}" y="${ART_Y - PX / 2}" width="${COLS * PX + PX}" height="${ROWS * PX + PX}" fill="${PAL[0]}"/>`,
-  ].join('');
-
-  const body = paint(scene(card));
-  // Scale 3 keeps the glyphs clear of the art window's frame at y = 28.
-  const numeralText = numeral ? pixelText(numeral, CARD_W / 2, PX + 4, 3, PAL[0]) : '';
-  const titleText = lines
-    .map((ln, i) => pixelText(ln, CARD_W / 2, titleTop + i * 18, 3, PAL[0]))
-    .join('');
-
-  const spin = reversed ? ` transform="rotate(180 ${CARD_W / 2} ${CARD_H / 2})"` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CARD_W} ${CARD_H}" width="${width}" height="${Math.round((width * CARD_H) / CARD_W)}" shape-rendering="crispEdges" role="img" data-card="${card.id}" data-orientation="${reversed ? 'reversed' : 'upright'}" aria-label="${title}${reversed ? ', reversed' : ''}"><g${spin}>${frame}${body}${numeralText}${titleText}</g></svg>`;
+/** Pixel banner title — short names fit; longer ones shrink via letter-spacing. */
+function titleText(label, y) {
+  const size = label.length > 18 ? 7 : label.length > 12 ? 8 : 9;
+  return el('text', {
+    x: W / 2,
+    y,
+    'text-anchor': 'middle',
+    'font-size': size,
+    'font-family': "'Press Start 2P', monospace",
+    fill: C.cream,
+    'letter-spacing': label.length > 16 ? -0.4 : 0.5,
+  }, label.length > 22 ? `${label.slice(0, 20)}…` : label);
 }
 
-/** The card back — identical for every card, so it gives nothing away. */
+let faceSeq = 0;
+
+/** Render one card face as a standalone SVG string. */
+export function cardSVG(card, { reversed = false, width = 200, fontHref = null } = {}) {
+  const clipId = `face-${card.id}-${(faceSeq += 1)}`;
+  const body = scene(card);
+  const numeral = numeralFor(card);
+  const inner = [
+    frame(),
+    el('g', { 'clip-path': `url(#${clipId})` }, body),
+    // Pixel inset border around the art window
+    px(4, 6, 42, 1, C.ink) + px(4, 73, 42, 1, C.ink) + px(4, 6, 1, 68, C.ink) + px(45, 6, 1, 68, C.ink),
+    // Title plate
+    px(4, 74, 42, 9, C.ink) + px(5, 75, 40, 7, C.greenDark),
+    numeral
+      ? el('text', {
+        x: W / 2,
+        y: 5 * S - 2,
+        'text-anchor': 'middle',
+        'font-size': 8,
+        'font-family': "'Press Start 2P', monospace",
+        fill: C.ink,
+      }, numeral)
+      : '',
+    titleText(titleFor(card), H - 14),
+  ].join('');
+
+  const fontFace = fontHref
+    ? el('style', {}, `@font-face{font-family:'Press Start 2P';src:url('${fontHref}') format('truetype');}`)
+    : '';
+  const defs = el('defs', {}, fontFace + el('clipPath', { id: clipId }, rect(4 * S, 6 * S, 42 * S, 68 * S, '#fff')));
+  const spin = reversed ? ` transform="rotate(180 ${W / 2} ${H / 2})"` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${width}" height="${(width * H) / W}" role="img" data-card="${card.id}" data-orientation="${reversed ? 'reversed' : 'upright'}" aria-label="${titleFor(card)}${reversed ? ', reversed' : ''}" shape-rendering="crispEdges" style="image-rendering:pixelated">${defs}<g${spin}>${inner}</g></svg>`;
+}
+
+/** The card back — overworld night with a glowing gem lattice. */
 export function backSVG({ width = 200 } = {}) {
-  const cv = canvas('N');
-  for (let y = 1; y < ROWS - 2; y += 5) {
-    for (let x = 1; x < COLS - 2; x += 5) {
-      stamp(cv, S.star, x, y, {});
+  const tiles = [];
+  for (let y = 8; y < 78; y += 8) {
+    for (let x = 6; x < 44; x += 8) {
+      tiles.push(px(x, y, 5, 5, C.blueDark));
+      tiles.push(px(x + 1, y + 1, 3, 3, C.night));
+      tiles.push(gem(x + 1, y + 1, (x + y) % 16 === 0 ? C.gold : C.rupee));
     }
   }
-  const frame = [
-    `<rect x="0" y="0" width="${CARD_W}" height="${CARD_H}" fill="${PAL.c}"/>`,
-    `<rect x="${PX}" y="${PX}" width="${CARD_W - 2 * PX}" height="${CARD_H - 2 * PX}" fill="none" stroke="${PAL[0]}" stroke-width="${PX / 2}"/>`,
-    `<rect x="${ART_X - PX / 2}" y="${ART_Y - PX / 2}" width="${COLS * PX + PX}" height="${ROWS * PX + PX}" fill="${PAL[0]}"/>`,
-  ].join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CARD_W} ${CARD_H}" width="${width}" height="${Math.round((width * CARD_H) / CARD_W)}" shape-rendering="crispEdges" role="img" aria-label="Face-down card"><g>${frame}${paint(cv)}${pixelText('CARDS', CARD_W / 2, CARD_H - 5 * PX, 3, PAL[0])}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${width}" height="${(width * H) / W}" role="img" aria-label="Face-down card" style="image-rendering:pixelated">${rect(0, 0, W, H, C.nightDeep)}${px(2, 2, 46, 81, C.ink)}${px(3, 3, 44, 79, C.night)}${tiles.join('')}${px(3, 3, 44, 1, C.gold)}${px(3, 81, 44, 1, C.gold)}${px(3, 3, 1, 79, C.gold)}${px(46, 3, 1, 79, C.gold)}</svg>`;
 }
 
-export const PALETTE = PAL;
-export const CARD_SIZE = { width: CARD_W, height: CARD_H };
-export { FONT };
+export const PALETTE = C;
+export const CARD_SIZE = { width: W, height: H };

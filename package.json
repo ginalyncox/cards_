@@ -1,7 +1,7 @@
 {
-  "name": "cards",
+  "name": "wilds",
   "version": "1.0.0",
-  "description": "A Rider-Waite-Smith tarot deck and companion app — 78 cards, vector art, spreads and a private journal.",
+  "description": "Wilds — a Rider-Waite-Smith tarot deck and companion in cartoony 16-bit adventure pixel art.",
   "type": "module",
   "private": true,
   "author": "Gina Lyn Cox",

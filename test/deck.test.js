@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DECK, SUITS, draw, shuffle, byId } from '../src/data/deck.js';
 import { SPREADS } from '../src/data/spreads.js';
-import { cardSVG, backSVG, CARD_SIZE, FONT } from '../src/js/art.js';
+import { cardSVG, backSVG, CARD_SIZE } from '../src/js/art.js';
 
 test('the deck holds exactly 78 unique cards', () => {
   assert.equal(DECK.length, 78);
@@ -91,14 +91,12 @@ test('every card renders to well-formed SVG, upright and reversed', () => {
   }
 });
 
-test('card faces are self-contained, with no shared document ids', () => {
-  // Every face is inlined into one page, so an id or url() reference would
-  // collide across cards.
-  for (const card of DECK) {
-    const svg = cardSVG(card);
-    assert.ok(!svg.includes(' id="'), `${card.name} declares an id`);
-    assert.ok(!svg.includes('url(#'), `${card.name} references an id`);
-  }
+test('card faces use unique clip path ids so inline SVGs do not collide', () => {
+  const a = cardSVG(DECK[0]);
+  const b = cardSVG(DECK[0]);
+  const idOf = (svg) => svg.match(/clipPath id="([^"]+)"/)[1];
+  assert.notEqual(idOf(a), idOf(b));
+  assert.ok(a.includes(`url(#${idOf(a)})`));
 });
 
 test('faces render as hard-edged pixels', () => {
@@ -112,6 +110,25 @@ test('faces render as hard-edged pixels', () => {
 test('the card back is identical for every card', () => {
   assert.equal(backSVG(), backSVG());
   assert.ok(!backSVG().includes('rotate(180'));
+});
+
+test('generic pip sky and ground meet with no parchment gap', () => {
+  // skyBand defaults to row 52; groundBand must start there too or the cream
+  // frame shows through as a tan horizon strip on minor faces.
+  const svg = cardSVG(byId('wands-1'));
+  const rects = [...svg.matchAll(/<rect x="(\d+)" y="(\d+)" width="(\d+)" height="(\d+)" fill="([^"]+)"/g)]
+    .map(([, x, y, w, h, f]) => ({ x: +x, y: +y, w: +w, h: +h, f }));
+  const sky = rects.find((r) => r.x === 16 && r.y === 24 && r.w === 168 && r.f === '#6ec8f0');
+  const ground = rects.find((r) => r.x === 16 && r.w === 168 && r.f === '#48a838');
+  assert.ok(sky && ground, 'Ace of Wands should paint sky and grass bands');
+  assert.equal(sky.y + sky.h, ground.y);
+  assert.equal(ground.y + ground.h, 296, 'ground reaches the art-window bottom');
+});
+
+test('standalone exports can load the bundled pixel font', () => {
+  const svg = cardSVG(byId('major-16'), { fontHref: 'PressStart2P-Regular.ttf' });
+  assert.match(svg, /@font-face/);
+  assert.match(svg, /url\('PressStart2P-Regular\.ttf'\)/);
 });
 
 test('no card face emits invalid geometry', () => {
@@ -134,17 +151,5 @@ test('every card title fits inside the card', () => {
       assert.ok(Number(x) >= 0, `${card.name} paints left of the card edge`);
       assert.ok(Number(x) + Number(w) <= CARD_SIZE.width, `${card.name} paints past the right edge`);
     }
-  }
-});
-
-test('the pixel font covers every character used on a card', () => {
-  const used = new Set();
-  for (const card of DECK) {
-    const title = (card.arcana === 'major' ? card.name : `${card.rankLabel} of ${card.suitName}`).toUpperCase();
-    const numeral = card.arcana === 'major' ? card.roman : String(card.number);
-    [...title, ...numeral].forEach((ch) => used.add(ch));
-  }
-  for (const ch of used) {
-    assert.ok(FONT[ch], `no glyph for ${JSON.stringify(ch)}`);
   }
 });
